@@ -1,0 +1,156 @@
+﻿@model WebApplication3.ViewModels.AdminDashboardViewModel
+@{
+    ViewBag.Title = "Admin Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Mobile Toggle Button -->
+<button class="btn btn-outline-dark d-md-none m-2" onclick="toggleSidebar()">
+    ☰ Menu
+</button>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav id="sidebar" class="col-md-3 col-12 bg-dark text-white vh-100 sticky-top d-none d-md-block" style="overflow-y:auto;">
+            <div class="px-3 py-4">
+                <h4 class="text-center border-bottom pb-3 mb-4">Admin Panel</h4>
+
+                <!-- Dashboard Shortcut -->
+                <div class="text-center mb-4">
+                    @Html.ActionLink("🛠 Admin Dashboard", "CreateTimetable", "Admin", null, new { @class = "btn btn-primary w-75" })
+                </div>
+
+                <!-- Section: User Management -->
+                <button class="btn btn-dark w-100 text-start mb-2" onclick="toggleMenu('userMenu')">👥 User Management</button>
+                <div id="userMenu" class="submenu ps-3" style="display:none;">
+                    @Html.ActionLink("Add Student", "Signup", "Student", null, new { @class = "d-block py-2 text-white text-decoration-none" })
+                    @Html.ActionLink("Add Teacher", "Signup", "Teacher", null, new { @class = "d-block py-2 text-white text-decoration-none" })
+                    @Html.ActionLink("Add Parent", "Signup", "Parent", null, new { @class = "d-block py-2 text-white text-decoration-none" })
+                    @Html.ActionLink("Add Admin", "Signup", "Admin", null, new { @class = "d-block py-2 text-white text-decoration-none" })
+                </div>
+
+                <!-- Section: Academic Setup -->
+                <button class="btn btn-dark w-100 text-start mb-2" onclick="toggleMenu('streamMenu')">🏫 Academic Setup</button>
+                <div id="streamMenu" class="submenu ps-3" style="display:none;">
+                    @Html.ActionLink("Add Stream", "AddStream", "Admin", null, new { @class = "d-block py-2 text-white text-decoration-none" })
+                    @Html.ActionLink("Assign Subject To Grade and Stream", "AddSubject", "Admin", null, new { @class = "d-block py-2 text-white text-decoration-none" })
+                    @Html.ActionLink("Add Class", "AddClassroom", "Admin", null, new { @class = "d-block py-2 text-white text-decoration-none" })
+                    @Html.ActionLink("Assign Subjects to Teachers", "AssignSubjects", "Admin", null, new { @class = "d-block py-2 text-white text-decoration-none" })
+                    @Html.ActionLink("View TeacherAssignments", "ViewTeacherAssignments", "Admin", null, new { @class = "d-block py-2 text-white text-decoration-none" })
+                </div>
+
+                <!-- Section: Timetable Management -->
+                <button class="btn btn-dark w-100 text-start mb-2" onclick="toggleMenu('timetableMenu')">📅 Timetable Management</button>
+                <div id="timetableMenu" class="submenu ps-3" style="display:none;">
+                    @Html.ActionLink("Create Timetable Entry", "CreateTimetable", "Admin", null, new { @class = "d-block py-2 text-white text-decoration-none" })
+                    @Html.ActionLink("View Weekly Timetable", "ClassTimetable", "Admin", null, new { @class = "d-block py-2 text-white text-decoration-none" })
+                    @Html.ActionLink("Filter by Classroom", "ClassTimetable", "Admin", null, new { @class = "d-block py-2 text-white text-decoration-none" })
+                </div>
+
+                <!-- Uniform Shop -->
+                <button class="btn btn-dark w-100 text-start" onclick="toggleMenu('uniformMenu')">🛍️ Uniform Shop</button>
+                <div id="uniformMenu" class="submenu">
+                    @Html.ActionLink("Manage Items", "UniformItems", "Admin", null, new { @class = "d-block px-4 py-2 text-white text-decoration-none" })
+                    @Html.ActionLink("Add New Item", "CreateUniformItem", "Admin", null, new { @class = "d-block px-4 py-2 text-white text-decoration-none" })
+                    @Html.ActionLink("Manage Categories", "UniformCategories", "Admin", null, new { @class = "d-block px-4 py-2 text-white text-decoration-none" })
+                    @Html.ActionLink("View Orders", "UniformOrders", "Admin", null, new { @class = "d-block px-4 py-2 text-white text-decoration-none" })
+                </div>
+
+                @Html.ActionLink("👥 Review Students", "PendingDocuments", "Admin", null, new { @class = "btn btn-dark w-100 text-start mb-2" })
+
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="col-md-9 col-12 pt-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light text-dark">
+                    <h4 class="mb-0">Welcome, @Model.FullName</h4>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h5>Admin Details</h5>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item"><strong>Admin ID:</strong> @Model.Id</li>
+                            <li class="list-group-item"><strong>Full Name:</strong> @Model.FullName</li>
+                            <li class="list-group-item"><strong>Email:</strong> @Model.Email</li>
+                            <li class="list-group-item"><strong>Contact Number:</strong> @Model.PhoneNumber</li>
+                        </ul>
+                    </div>
+
+                    <!-- Student Documents Section -->
+                    <div class="mb-4">
+                        <h5>📄 Student Documents Pending Review</h5>
+
+                        @if (Model.PendingDocuments != null && Model.PendingDocuments.Any())
+                        {
+                            <table class="table table-bordered table-striped table-hover mt-3">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Student</th>
+                                        <th>Documents</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        var groupedByStudent = Model.PendingDocuments
+                                            .GroupBy(d => d.StudentId)
+                                            .ToList();
+                                    }
+
+                                    @foreach (var studentGroup in groupedByStudent)
+                                    {
+                                        var student = studentGroup.First().Student;
+                                        <tr>
+                                            <td>
+                                                @(student != null
+                                                    ? student.FullName + " (" + student.Id + ")"
+                                                    : "Unknown Student (" + studentGroup.Key + ")")
+                                            </td>
+                                            <td>
+                                                <ul class="list-unstyled mb-0">
+                                                    @foreach (var doc in studentGroup)
+                                                    {
+                                                        <li>@doc.DocumentType - @doc.Status (@doc.UploadedAt.ToString("dd MMM yyyy"))</li>
+                                                    }
+                                                </ul>
+                                            </td>
+                                            <td>
+                                                @Html.ActionLink(
+                                                    "Review Student",
+                                                    "ReviewStudent",
+                                                    "Admin",
+                                                    new { studentId = studentGroup.Key },
+                                                    new { @class = "btn btn-sm btn-info" }
+                                                )
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                        else
+                        {
+                            <div class="alert alert-info">✅ No pending student documents for review.</div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- Toggle Scripts -->
+<script>
+    function toggleMenu(menuId) {
+        const menu = document.getElementById(menuId);
+        menu.style.display = menu.style.display === "block" ? "none" : "block";
+    }
+
+    function toggleSidebar() {
+        const sidebar = document.getElementById("sidebar");
+        sidebar.classList.toggle("d-none");
+    }
+</script>

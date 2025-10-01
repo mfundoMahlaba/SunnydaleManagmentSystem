@@ -1,0 +1,170 @@
+﻿@model WebApplication3.ViewModels.ReviewStudentViewModel
+@{
+    ViewBag.Title = "Review Student";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Review Student: @Model.Student.FullName (@Model.Student.Id)</h4>
+        </div>
+
+        <div class="card-body">
+            <!-- ✅ Feedback Messages -->
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success">@TempData["Success"]</div>
+            }
+            else if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger">@TempData["Error"]</div>
+            }
+
+            <!-- 📧 Student Email -->
+            <p>
+                <strong>Email:</strong>
+                @if (string.IsNullOrWhiteSpace(Model.Student.Email))
+                {
+                    <span class="text-danger">No email address on file</span>
+                }
+                else
+                {
+                    <span class="text-dark">@Model.Student.Email</span>
+                }
+            </p>
+
+            <!-- 📄 Uploaded Documents -->
+            <div class="mb-4">
+                <h5>📄 Uploaded Documents</h5>
+
+                @if (Model.Documents != null && Model.Documents.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped table-hover mt-3">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Document</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                    <th>Uploaded</th>
+                                    <th>Admin Comment</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var doc in Model.Documents)
+                                {
+                                    <tr>
+                                        <td><a href="@Url.Content(doc.FilePath)" target="_blank">@doc.FileName</a></td>
+                                        <td>@doc.DocumentType</td>
+                                        <td>
+                                            @if (doc.Status == "Approved")
+                                            {
+                                                <span class="badge bg-success">@doc.Status</span>
+                                            }
+                                            else if (doc.Status == "Rejected")
+                                            {
+                                                <span class="badge bg-danger">@doc.Status</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">@doc.Status</span>
+                                            }
+                                        </td>
+                                        <td>@doc.UploadedAt.ToString("dd MMM yyyy")</td>
+                                        <td>@doc.AdminComment</td>
+                                        <td>
+                                            <div class="mb-2">
+                                                @using (Html.BeginForm("ApproveDocument", "Admin", FormMethod.Post))
+                                                {
+                                                    @Html.Hidden("docId", doc.Id)
+                                                    <input type="text" name="comment" placeholder="Optional comment" class="form-control form-control-sm mb-1" />
+                                                    <button type="submit" class="btn btn-success btn-sm w-100">Approve</button>
+                                                }
+                                            </div>
+                                            <div>
+                                                @using (Html.BeginForm("RejectDocument", "Admin", FormMethod.Post))
+                                                {
+                                                    @Html.Hidden("docId", doc.Id)
+                                                    <input type="text" name="comment" placeholder="Optional comment" class="form-control form-control-sm mb-1" />
+                                                    <button type="submit" class="btn btn-danger btn-sm w-100">Reject</button>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                        }
+                        else
+                        {
+                        <div class="alert alert-info">No documents uploaded by this student.</div>
+                        }
+                    </div>
+
+                    <!-- 📤 Send Promotion Email -->
+                    @using (Html.BeginForm("SendPromotionEmail", "Admin", FormMethod.Post))
+                    {
+                        @Html.Hidden("studentId", Model.Student.Id)
+                        <button type="submit" class="btn btn-outline-primary mt-3"
+                                @(string.IsNullOrWhiteSpace(Model.Student.Email) ? "disabled" : "")>
+                            <i class="fas fa-envelope me-2"></i> Send Promotion Email
+                        </button>
+                    }
+
+                    <!-- 📊 Previous Academic Results -->
+                    @if (Model.PreviousResults != null && Model.PreviousResults.Any())
+                    {
+                        <div class="card shadow-sm border-0 mb-4">
+                            <div class="card-header bg-secondary text-white">
+                                <h5 class="mb-0">📊 Previous Results — Year @Model.LatestYear</h5>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-bordered table-striped table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Subject</th>
+                                            <th>Percentage</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var result in Model.PreviousResults)
+                                        {
+                                            <tr>
+                                                <td>@result.Subject.Name</td>
+                                                <td>@result.Percentage%</td>
+                                                <td>
+                                                    @if (result.Percentage < 30)
+                                                    {
+                                                        <span class="badge bg-danger">Failed</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge bg-success">Passed</span>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+
+                                <div class="alert alert-info mt-3">
+                                    <strong>Average:</strong> @(Model.AveragePercentage?.ToString("F2") ?? "N/A")% |
+                                    <strong>Failed Subjects:</strong> @Model.FailedCount |
+                                    <strong>Previous Grade:</strong> Grade @Model.PreviousGrade
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning mb-4">
+                            No previous results found for this student.
+                        </div>
+                    }
+                </div>
+    </div>
+</div>

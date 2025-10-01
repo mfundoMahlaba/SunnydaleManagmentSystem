@@ -1,0 +1,64 @@
+﻿@model WebApplication3.ViewModels.AssignSubjectsViewModel
+
+<div class="container">
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h4 class="mb-0">Assign Subjects to Teacher</h4>
+        </div>
+        <div class="card-body">
+
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success">@TempData["Success"]</div>
+            }
+
+            <!-- Filter Section -->
+            <form method="get" class="mb-4">
+                <div class="row g-3">
+                    <div class="col-md-6 col-lg-4">
+                        <input type="text" name="teacherName" value="@Model.FilterTeacherName" class="form-control" placeholder="Filter by teacher name" />
+                    </div>
+                    <div class="col-md-6 col-lg-4">
+                        @Html.DropDownList("gradeId", Model.Grades, "Filter by grade", new { @class = "form-control" })
+                    </div>
+                    <div class="col-md-12 col-lg-4 text-end">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-filter"></i> Apply Filters
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Assignment Form -->
+            @using (Html.BeginForm())
+            {
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        @Html.LabelFor(m => m.SelectedTeacherId, htmlAttributes: new { @class = "form-label" })
+                        @Html.DropDownListFor(m => m.SelectedTeacherId, Model.Teachers, "Select Teacher", new { @class = "form-control" })
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        @Html.Label("Subjects", htmlAttributes: new { @class = "form-label" })
+                        @Html.ListBoxFor(m => m.SelectedSubjectIds, Model.Subjects, new { @class = "form-control", size = 6 })
+                    </div>
+                    <div class="col-md-6">
+                        @Html.Label("Grades", htmlAttributes: new { @class = "form-label" })
+                        @Html.ListBoxFor(m => m.SelectedGradeIds, Model.Grades, new { @class = "form-control", size = 6 })
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-check-circle"></i> Assign Subjects
+                    </button>
+                    <a href="@Url.Action("Dashboard", "Admin")" class="btn btn-outline-secondary">
+                        <i class="fas fa-home"></i> Back to Dashboard
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,71 @@
+﻿@model List<WebApplication3.ViewModels.StudentMarkOverviewViewModel>
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="mb-0 text-dark fw-bold">
+                📊 Marks for @ViewBag.SubjectName – Grade @ViewBag.GradeName
+            </h4>
+            <a href="@Url.Action("Dashboard", "Teacher")" class="btn btn-outline-secondary">
+                <i class="fas fa-home me-1"></i> Back to Dashboard
+            </a>
+        </div>
+        <div class="card-body">
+
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger">@TempData["Error"]</div>
+            }
+
+            @if (!Model.Any())
+            {
+                <div class="alert alert-info">No student marks available for this subject and grade.</div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped align-middle">
+                        <thead class="table-light">
+                            <tr class="text-center">
+                                <th>Student ID</th>
+                                <th>Full Name</th>
+                                <th>Email</th>
+                                <th>Test</th>
+                                <th>Exam</th>
+                                <th>Assignment</th>
+                                <th>Average</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var student in Model)
+                            {
+                                <tr>
+                                    <td>@student.StudentId</td>
+                                    <td>@student.FullName</td>
+                                    <td>@student.Email</td>
+                                    <td class="text-center">
+                                        @(student.TestMark.HasValue ? student.TestMark.Value.ToString("F1") : "—")
+                                    </td>
+                                    <td class="text-center">
+                                        @(student.ExamMark.HasValue ? student.ExamMark.Value.ToString("F1") : "—")
+                                    </td>
+                                    <td class="text-center">
+                                        @(student.AssignmentMark.HasValue ? student.AssignmentMark.Value.ToString("F1") : "—")
+                                    </td>
+                                    <td class="text-center">@student.AverageMark.ToString("F1")</td>
+                                    <td class="text-center">
+                                        <a href="@Url.Action("CaptureMarks", "Teacher", new { studentId = student.StudentId, assignmentId = ViewBag.AssignmentId })"
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-edit me-1"></i> Edit
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>

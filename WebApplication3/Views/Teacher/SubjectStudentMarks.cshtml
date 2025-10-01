@@ -1,0 +1,38 @@
+﻿@model List<WebApplication3.ViewModels.StudentMarkOverviewViewModel>
+
+<div class="container mt-4">
+    <h4>Marks for @ViewBag.SubjectName - Grade @ViewBag.GradeName</h4>
+
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Student ID</th>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Test</th>
+                <th>Exam</th>
+                <th>Assignment</th>
+                <th>Average</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var student in Model)
+            {
+                <tr>
+                    <td>@student.StudentId</td>
+                    <td>@student.FullName</td>
+                    <td>@student.Email</td>
+                    <td>@(student.TestMark.HasValue ? student.TestMark.Value.ToString("F1") : "—")</td>
+                    <td>@(student.ExamMark.HasValue ? student.ExamMark.Value.ToString("F1") : "—")</td>
+                    <td>@(student.AssignmentMark.HasValue ? student.AssignmentMark.Value.ToString("F1") : "—")</td>
+                    <td>@student.AverageMark.ToString("F1")</td>
+                    <td>
+                        <a href="@Url.Action("CaptureMarks", "Teacher", new { studentId = student.StudentId, assignmentId = ViewBag.AssignmentId })"
+                           class="btn btn-sm btn-outline-primary">Edit</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

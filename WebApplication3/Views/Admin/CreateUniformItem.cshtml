@@ -1,0 +1,78 @@
+﻿@model WebApplication3.Models.UniformItem
+
+@{
+    ViewBag.Title = "Add Uniform Item";
+}
+
+<div class="container">
+    <div class="card shadow-sm mt-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">👕 Add New Uniform Item</h4>
+            <a href="@Url.Action("Dashboard", "Admin")" class="btn btn-outline-secondary">
+                <i class="fas fa-home me-1"></i> Back to Dashboard
+            </a>
+        </div>
+        <div class="card-body">
+
+            @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+
+            @using (Html.BeginForm("CreateUniformItem", "Admin", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                @Html.AntiForgeryToken()
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        @Html.LabelFor(m => m.Name, htmlAttributes: new { @class = "form-label" })
+                        @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="col-md-6">
+                        @Html.LabelFor(m => m.Price, htmlAttributes: new { @class = "form-label" })
+                        @Html.TextBoxFor(m => m.Price, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.Price, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="col-md-6">
+                        @Html.LabelFor(m => m.Stock, htmlAttributes: new { @class = "form-label" })
+                        @Html.TextBoxFor(m => m.Stock, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.Stock, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="col-md-6">
+                        @Html.Label("Category", htmlAttributes: new { @class = "form-label" })
+                        @Html.DropDownListFor(m => m.CategoryId, (SelectList)ViewBag.Categories, "-- Select Category --", new { @class = "form-select" })
+                        @Html.ValidationMessageFor(m => m.CategoryId, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="col-12">
+                        @Html.LabelFor(m => m.Description, htmlAttributes: new { @class = "form-label" })
+                        @Html.TextAreaFor(m => m.Description, new { @class = "form-control", rows = 3 })
+                        @Html.ValidationMessageFor(m => m.Description, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="col-md-6">
+                        @Html.Label("Upload Image", htmlAttributes: new { @class = "form-label" })
+                        <input type="file" name="imageFile" class="form-control" />
+                    </div>
+
+                    <div class="col-md-6 d-flex align-items-center">
+                        <div class="form-check mt-4">
+                            @Html.CheckBoxFor(m => m.IsActive, new { @class = "form-check-input" })
+                            @Html.LabelFor(m => m.IsActive, new { @class = "form-check-label" })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-start align-items-center">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-plus-circle me-1"></i> Add Item
+                    </button>
+                    <a href="@Url.Action("UniformItems", "Admin")" class="btn btn-secondary ms-2">
+                        <i class="fas fa-times-circle me-1"></i> Cancel
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>

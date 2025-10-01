@@ -1,0 +1,182 @@
+﻿@model WebApplication3.ViewModels.SubjectEnrollmentViewModel
+
+<div class="container mt-4">
+
+    <!-- Previous Results Section -->
+    @if (Model.PreviousResults != null && Model.PreviousResults.Any())
+    {
+        <div class="card mb-4">
+            <div class="card-header bg-secondary text-white">
+                Previous Results (Year @Model.PreviousResults.First().Year)
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Subject</th>
+                            <th>Percentage</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var result in Model.PreviousResults)
+                        {
+                            <tr>
+                                <td>@result.Subject.Name</td>
+                                <td>@result.Percentage%</td>
+                                <td>
+                                    @if (result.Percentage < 30)
+                                    {
+                                        <span class="text-danger">Failed</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-success">Passed</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <div class="alert alert-info">
+                    <strong>Average:</strong> @(Model.AveragePercentage?.ToString("F2") ?? "N/A")% |
+                    <strong>Failed Subjects:</strong> @Model.FailedCount |
+                    <strong>Previous Grade:</strong> Grade @Model.PreviousGrade
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning mb-4">
+            No previous results found.
+        </div>
+    }
+
+    <h4>Enroll in Subjects</h4>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger">
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        </div>
+    }
+
+    @using (Html.BeginForm("EnrollSubjects", "Student", FormMethod.Post, new { @id = "enrollmentForm" }))
+    {
+        <div class="form-group">
+            @Html.LabelFor(m => m.SelectedYear)
+            @Html.DropDownListFor(m => m.SelectedYear, Model.Years, "Select Year", new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.SelectedYear, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.SelectedStudentType)
+            @Html.DropDownListFor(m => m.SelectedStudentType, Model.StudentTypeList, "Select Student Type", new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.SelectedStudentType, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.SelectedGradeId)
+            @Html.DropDownListFor(m => m.SelectedGradeId, Model.Grades, "Select Grade", new
+            {
+                @class = "form-control",
+                @id = "SelectedGradeId"
+            })
+            @Html.ValidationMessageFor(m => m.SelectedGradeId, "", new { @class = "text-danger" })
+        </div>
+        <div class="form-group" id="streamContainer" style="display:@((Model.SelectedGradeId == 10 || Model.SelectedGradeId == 11 || Model.SelectedGradeId == 12) ? "block" : "none");">
+            @Html.LabelFor(m => m.SelectedStreamId)
+            @Html.DropDownListFor(m => m.SelectedStreamId, Model.Streams ?? new List<SelectListItem>(), "Select Stream", new
+            {
+                @class = "form-control",
+                @id = "SelectedStreamId"
+            })
+            @Html.ValidationMessageFor(m => m.SelectedStreamId, "", new { @class = "text-danger" })
+        </div>
+
+        @*<div class="form-group" id="streamContainer" style="display:none;">
+                @Html.LabelFor(m => m.SelectedStreamId)
+                @Html.DropDownListFor(m => m.SelectedStreamId, Model.Streams ?? new List<SelectListItem>(), "Select Stream", new
+                {
+                    @class = "form-control",
+                    @id = "SelectedStreamId"
+                })
+                @Html.ValidationMessageFor(m => m.SelectedStreamId, "", new { @class = "text-danger" })
+            </div>*@
+
+        <div class="form-group">
+            @Html.Label("Select Subjects")
+            @Html.ListBoxFor(m => m.SelectedSubjectIds, Model.Subjects, new
+            {
+                @class = "form-control",
+                @id = "SelectedSubjectIds",
+                size = 10
+            })
+            @Html.ValidationMessageFor(m => m.SelectedSubjectIds, "", new { @class = "text-danger" })
+        </div>
+
+        <button type="submit" class="btn btn-primary">Enroll</button>
+        <div class="mb-3 text-end">
+            <a href="@Url.Action("Dashboard", "Student")" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-house-door"></i> Back to Dashboard
+            </a>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            function fetchSubjects(gradeId, streamId) {
+                var subjectList = $("#SelectedSubjectIds");
+                subjectList.empty();
+
+                $.getJSON("/Student/GetSubjectsByGrade", { gradeId: gradeId, streamId: streamId }, function (data) {
+                    if (data.length === 0) {
+                        subjectList.append($("<option>").text("No subjects available"));
+                    } else {
+                        $.each(data, function (i, item) {
+                            subjectList.append($("<option>").val(item.Value).text(item.Text));
+                        });
+                    }
+                });
+            }
+
+            $("#SelectedGradeId").change(function () {
+                var gradeId = parseInt($(this).val());
+                var subjectList = $("#SelectedSubjectIds");
+                subjectList.empty();
+
+                if (gradeId === 10 || gradeId === 11 || gradeId === 12) {
+                    $("#streamContainer").show();
+
+                    $.getJSON("/Student/GetStreams", function (data) {
+                        var streamDropdown = $("#SelectedStreamId");
+                        streamDropdown.empty();
+                        streamDropdown.append($("<option>").val("").text("Select Stream"));
+                        $.each(data, function (i, item) {
+                            streamDropdown.append($("<option>").val(item.Value).text(item.Text));
+                        });
+                    });
+
+                    $("#SelectedStreamId").off("change").on("change", function () {
+                        var streamId = parseInt($(this).val());
+                        if (streamId) {
+                            fetchSubjects(gradeId, streamId);
+                        }
+                    });
+                } else {
+                    $("#streamContainer").hide();
+                    $("#SelectedStreamId").val("");
+                    fetchSubjects(gradeId, null);
+                }
+            });
+        });
+    </script>
+}

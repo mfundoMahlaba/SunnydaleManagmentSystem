@@ -1,0 +1,74 @@
+﻿@model List<WebApplication3.ViewModels.LearningMaterialListViewModel>
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="mb-0 text-dark fw-bold">📂 My Uploaded Materials</h4>
+            <a href="@Url.Action("Dashboard", "Teacher")" class="btn btn-outline-secondary">
+                <i class="fas fa-home me-1"></i> Back to Dashboard
+            </a>
+        </div>
+        <div class="card-body">
+
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <div class="d-flex justify-content-end mb-3">
+                @Html.ActionLink("📤 Upload New Material", "UploadMaterial", "Teacher", null, new { @class = "btn btn-outline-primary" })
+            </div>
+
+            @if (!Model.Any())
+            {
+                <div class="alert alert-info">You haven’t uploaded any learning materials yet.</div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped align-middle">
+                        <thead class="table-light">
+                            <tr class="text-center">
+                                <th>Title</th>
+                                <th>Description</th>
+                                <th>Subject</th>
+                                <th>Uploaded</th>
+                                <th>File</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@item.Title</td>
+                                    <td>@item.Description</td>
+                                    <td>@item.SubjectName</td>
+                                    <td>@item.UploadedAt.ToString("yyyy-MM-dd")</td>
+                                    <td>
+                                        <a href="@Url.Content(item.FilePath)" target="_blank" class="btn btn-sm btn-outline-info">
+                                            <i class="fas fa-file-alt me-1"></i> View
+                                        </a>
+                                    </td>
+                                    <td class="text-center">
+                                        <a href="@Url.Action("EditMaterial", "Teacher", new { id = item.Id })" class="btn btn-sm btn-warning me-1">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a>
+                                        <a href="@Url.Action("DeleteMaterial", "Teacher", new { id = item.Id })"
+                                           class="btn btn-sm btn-danger"
+                                           onclick="return confirm('Are you sure you want to delete this material?');">
+                                            <i class="fas fa-trash-alt"></i> Delete
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>

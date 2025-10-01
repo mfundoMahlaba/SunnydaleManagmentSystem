@@ -1,0 +1,83 @@
+﻿@model WebApplication3.Models.UniformOrder
+@{
+    ViewBag.Title = "Order Success";
+}
+
+<h2>Order Confirmation</h2>
+
+<div class="alert alert-success">
+    <strong>Thank you!</strong> Your order has been completed successfully and is now confirmed.
+</div>
+
+<h4>Order Summary</h4>
+<ul class="list-unstyled">
+    <li><strong>Order #:</strong> @Model.Id</li>
+    <li><strong>Date:</strong> @Model.OrderDate.ToString("dd MMM yyyy HH:mm")</li>
+    <li>
+        <strong>Status:</strong>
+        <span class="@(Model.Status == "Completed" ? "text-success fw-bold" : "text-warning")">
+            @(Model.Status == "Pending" ? "Completed" : Model.Status)
+        </span>
+    </li>
+    <li><strong>Total Paid:</strong> @Model.TotalAmount.ToString("C")</li>
+    @if (!string.IsNullOrEmpty(Model.TransactionId))
+    {
+        <li><strong>Transaction ID:</strong> @Model.TransactionId</li>
+    }
+</ul>
+
+@if (Model.Items != null && Model.Items.Any())
+{
+    <h4>Items Purchased</h4>
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Size</th>
+                <th>Unit Price</th>
+                <th>Quantity</th>
+                <th>Line Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var it in Model.Items)
+            {
+                <tr>
+                    <td>@(it.UniformItem?.Name ?? "Item #" + it.UniformItemId)</td>
+                    <td>@it.Size</td>
+                    <td>@it.UnitPrice.ToString("C")</td>
+                    <td>@it.Quantity</td>
+                    <td>@((it.UnitPrice * it.Quantity).ToString("C"))</td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="4" class="text-end"><strong>Grand Total:</strong></td>
+                <td><strong>@Model.TotalAmount.ToString("C")</strong></td>
+            </tr>
+        </tfoot>
+    </table>
+}
+
+@if (!string.IsNullOrEmpty(Model.RecipientName))
+{
+    <h4>Recipient Information</h4>
+    <p>
+        <strong>Name:</strong> @Model.RecipientName <br />
+        <strong>Email:</strong> @Model.RecipientEmail
+    </p>
+}
+
+<div class="mt-4">
+    <a href="@Url.Action("Index", "Uniform")" class="btn btn-primary">Continue Shopping</a>
+    <a href="@Url.Action("MyOrders", "Parent")" class="btn btn-info">View My Orders</a>
+</div>
+
+<hr />
+
+<p class="text-muted">
+    This confirmation serves as your <strong>official invoice</strong>.
+    A copy has also been emailed to you.
+    For any queries, please contact the school office.
+</p>

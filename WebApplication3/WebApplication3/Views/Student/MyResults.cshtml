@@ -1,0 +1,63 @@
+﻿@model IEnumerable<WebApplication3.Models.PreviousResult>
+@{
+    ViewBag.Title = "My Results";
+}
+
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            <h4 class="mb-0">My Captured Results</h4>
+        </div>
+        <div class="card-body">
+
+            @if (!Model.Any())
+            {
+                <div class="alert alert-info">
+                    You haven’t captured any results yet.
+                    <a href="@Url.Action("Capture", "Student")" class="alert-link">Click here to add results</a>.
+                </div>
+            }
+            else
+            {
+                var grouped = Model.GroupBy(r => new { r.Year, r.Grade });
+
+                foreach (var group in grouped.OrderByDescending(g => g.Key.Year))
+                {
+                    <div class="card mb-4 shadow-sm">
+                        <div class="card-header bg-light text-black">
+                            <strong>@group.Key.Year - Grade @group.Key.Grade</strong>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Subject</th>
+                                            <th>Percentage</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var result in group.OrderBy(r => r.Subject.Name))
+                                        {
+                                            <tr>
+                                                <td>@result.Subject.Name</td>
+                                                <td>@result.Percentage.ToString("F2")%</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>
+<div class="mb-3 text-end">
+    <a href="@Url.Action("Dashboard", "Student")" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-house-door"></i> Back to Dashboard
+    </a>
+</div>
+
+

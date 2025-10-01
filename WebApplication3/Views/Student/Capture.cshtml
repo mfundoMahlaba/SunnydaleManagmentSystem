@@ -1,0 +1,217 @@
+﻿@model WebApplication3.ViewModels.CaptureResultsViewModel
+@{
+    ViewBag.Title = "Capture Previous Results";
+}
+
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            <h4 class="mb-0">Capture Previous Results</h4>
+        </div>
+        <div class="card-body">
+
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success">@TempData["Success"]</div>
+            }
+
+            @using (Html.BeginForm("Capture", "Student", FormMethod.Post))
+            {
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Grade</label>
+                        @Html.DropDownListFor(m => m.Grade, new SelectList(ViewBag.Grades, "Id", "Description"), "Select Grade", new { @class = "form-control" })
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Year</label>
+                        @Html.DropDownListFor(m => m.Year, new SelectList(Enumerable.Range(2023, DateTime.Now.Year - 2023 + 1).Reverse()), "Select Year", new { @class = "form-control", id = "Year" })
+                    </div>
+                </div>
+
+                <div class="table-responsive mb-4">
+                    <table class="table table-hover" id="resultsTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Subject</th>
+                                <th>Percentage</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < Model.Results.Count; i++)
+                            {
+                                <tr>
+                                    <td>
+                                        @Html.DropDownListFor(m => m.Results[i].SubjectId,
+                                            new SelectList(ViewBag.Subjects, "Id", "Name"),
+                                            "Select Subject",
+                                            new { @class = "form-control subjectSelect" })
+                                    </td>
+                                    <td>
+                                        @Html.TextBoxFor(m => m.Results[i].Percentage, new { @class = "form-control subjectPercent", type = "number", step = "0.01", min = "0", max = "100" })
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-danger removeRow"><i class="fas fa-trash-alt"></i></button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <button type="button" id="addRow" class="btn btn-secondary mb-3">
+                    <i class="fas fa-plus-circle"></i> Add Subject
+                </button>
+
+                <div class="card preview-card p-3 mb-4">
+                    <h5>Preview of Captured Results</h5>
+                    <table class="table table-striped" id="previewTable">
+                        <thead>
+                            <tr>
+                                <th>Subject</th>
+                                <th>Percentage</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                        <tfoot>
+                            <tr>
+                                <th>Average</th>
+                                <th id="avgCell">0%</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Save All Results
+                </button>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Hidden template row -->
+<table style="display:none;">
+    <tbody>
+        <tr id="templateRow">
+            <td>
+                <select class="form-control subjectSelect">
+                    <option value="">Select Subject</option>
+                    @foreach (var subj in ViewBag.Subjects)
+                    {
+                        <option value="@subj.Id">@subj.Name</option>
+                    }
+                </select>
+            </td>
+            <td>
+                <input class="form-control subjectPercent" type="number" step="0.01" min="0" max="100" />
+            </td>
+            <td>
+                <button type="button" class="btn btn-sm btn-danger removeRow"><i class="fas fa-trash-alt"></i></button>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+@section scripts {
+    <script>
+$(function () {
+    const capturedYears = @Html.Raw(Json.Encode(ViewBag.CapturedYears));
+
+    function reIndexRows() {
+        $('#resultsTable tbody tr').each(function (i) {
+            $(this).find('.subjectSelect').attr('name', `Results[${i}].SubjectId`);
+            $(this).find('.subjectPercent').attr('name', `Results[${i}].Percentage`);
+        });
+    }
+
+    function refreshPreview() {
+        var previewBody = $("#previewTable tbody").empty();
+        var total = 0, count = 0;
+
+        $("#resultsTable tbody tr").each(function () {
+            var subject = $(this).find(".subjectSelect option:selected").text();
+            var percentage = $(this).find(".subjectPercent").val();
+
+            if (subject && subject !== "Select Subject" && percentage) {
+                var p = parseFloat(percentage);
+                if (!isNaN(p)) {
+                    previewBody.append(`<tr><td>${subject}</td><td>${p.toFixed(2)}%</td></tr>`);
+                    total += p;
+                    count++;
+                }
+            }
+        });
+
+        var avg = count > 0 ? (total / count).toFixed(2) : "0";
+        $("#avgCell").text(avg + "%");
+    }
+
+    $("#addRow").click(function () {
+        var $new = $("#templateRow").clone().removeAttr("id").show();
+        $("#resultsTable tbody").append($new);
+        reIndexRows();
+        refreshPreview();
+    });
+
+    $(document).on("click", ".removeRow", function () {
+        $(this).closest("tr").remove();
+        reIndexRows();
+        refreshPreview();
+    });
+
+    $(document).on("change keyup", "#resultsTable select, #resultsTable input", function () {
+        refreshPreview();
+    });
+
+    $("form").submit(function (e) {
+        const subjectCount = $("#resultsTable tbody tr").length;
+        const selectedYear = parseInt($("#Year").val());
+
+        if (subjectCount < 7) {
+            alert("You must capture results for at least 7 subjects.");
+            e.preventDefault();
+            return;
+        }
+
+        if (capturedYears.includes(selectedYear)) {
+            alert(`You have already captured results for the year ${selectedYear}.`);
+            e.preventDefault();
+            return;
+        }
+
+        let subjects = [];
+        let hasDuplicate = false;
+
+        $("#resultsTable tbody tr").each(function () {
+            let subjectId = $(this).find(".subjectSelect").val();
+            if (subjectId) {
+                if (subjects.includes(subjectId)) {
+                    hasDuplicate = true;
+                    return false;
+                }
+                subjects.push(subjectId);
+            }
+        });
+
+        if (hasDuplicate) {
+            alert("You cannot select the same subject more than once.");
+            e.preventDefault();
+            return;
+        }
+    });
+
+    reIndexRows();
+    refreshPreview();
+});
+    </script>
+}
+<script>
+    setTimeout(function () {
+        const alert = document.querySelector('.alert-success');
+        if (alert) {
+            alert.classList.remove('show');
+            alert.classList.add('fade');
+        }
+    }, 2000); // hides after 2 seconds
+</script>

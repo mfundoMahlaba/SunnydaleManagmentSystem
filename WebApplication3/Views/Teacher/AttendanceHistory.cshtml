@@ -1,0 +1,90 @@
+﻿@model WebApplication3.ViewModels.AttendanceHistoryFilterViewModel
+@{
+    ViewBag.Title = "Attendance History";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="mb-0 text-dark fw-bold">📚 Attendance History</h4>
+            <a href="@Url.Action("Dashboard", "Teacher")" class="btn btn-outline-secondary">
+                <i class="fas fa-home me-1"></i> Back to Dashboard
+            </a>
+        </div>
+        <div class="card-body">
+
+            @using (Html.BeginForm("AttendanceHistory", "Teacher", FormMethod.Get))
+            {
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        @Html.Label("Grade", new { @class = "form-label" })
+                        @Html.DropDownList("GradeId", Model.GradeOptions, "-- Grade --", new { @class = "form-select" })
+                    </div>
+                    <div class="col-md-3">
+                        @Html.Label("Subject", new { @class = "form-label" })
+                        @Html.DropDownList("SubjectId", Model.SubjectOptions, "-- Subject --", new { @class = "form-select searchable-subject" })
+                    </div>
+                    <div class="col-md-3">
+                        @Html.Label("From Date", new { @class = "form-label" })
+                        @Html.TextBox("FromDate", Model.FromDate?.ToString("yyyy-MM-dd"), new { @class = "form-control", type = "date" })
+                    </div>
+                    <div class="col-md-3">
+                        @Html.Label("To Date", new { @class = "form-label" })
+                        @Html.TextBox("ToDate", Model.ToDate?.ToString("yyyy-MM-dd"), new { @class = "form-control", type = "date" })
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search me-1"></i> Filter
+                </button>
+            }
+
+            @if (!Model.Records.Any())
+            {
+                <div class="alert alert-info mt-4">No attendance records found for the selected filters.</div>
+            }
+            else
+            {
+                <div class="table-responsive mt-4">
+                    <table class="table table-bordered table-striped align-middle">
+                        <thead class="table-light">
+                            <tr class="text-center">
+                                <th>Date</th>
+                                <th>Student</th>
+                                <th>Subject</th>
+                                <th>Period</th>
+                                <th>Present</th>
+                                <th>Remarks</th>
+                                <th>Marked By</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var record in Model.Records)
+                            {
+                                <tr>
+                                    <td>@record.Date.ToString("yyyy-MM-dd")</td>
+                                    <td>@record.StudentName</td>
+                                    <td>@record.SubjectName</td>
+                                    <td>@record.PeriodName</td>
+                                    <td class="text-center">@record.IsPresent</td>
+                                    <td>@record.Remarks</td>
+                                    <td>@record.MarkedBy</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('.searchable-subject').select2({
+            placeholder: "Search subject...",
+            allowClear: true,
+            width: '100%'
+        });
+    });
+</script>

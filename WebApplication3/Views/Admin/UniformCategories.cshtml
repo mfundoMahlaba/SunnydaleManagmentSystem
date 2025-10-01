@@ -1,0 +1,70 @@
+﻿@model IEnumerable<WebApplication3.Models.UniformCategory>
+
+@{
+    ViewBag.Title = "Uniform Categories";
+}
+
+<div class="container">
+    <div class="card shadow-sm mt-4">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">🎯 Uniform Categories</h4>
+            <div class="d-flex gap-2">
+                <a href="@Url.Action("UniformItems", "Admin")" class="btn btn-outline-primary">
+                    <i class="fas fa-tshirt me-1"></i> View Items
+                </a>
+                <a href="@Url.Action("CreateUniformCategory", "Admin")" class="btn btn-success">
+                    <i class="fas fa-plus-circle me-1"></i> Add New Category
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+
+            @if (!Model.Any())
+            {
+                <div class="alert alert-info">No uniform categories available.</div>
+            }
+            else
+            {
+                <div class="table-responsive mb-4">
+                    <table class="table table-bordered table-striped align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Category Name</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var cat in Model)
+                            {
+                                <tr>
+                                    <td>@cat.Name</td>
+                                    <td>
+                                        <div class="d-flex gap-2">
+                                            <a href="@Url.Action("EditUniformCategory", "Admin", new { id = cat.Id })" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </a>
+                                            @using (Html.BeginForm("DeleteUniformCategory", "Admin", FormMethod.Post))
+                                            {
+                                                @Html.AntiForgeryToken()
+                                                @Html.Hidden("id", cat.Id)
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this category?')">
+                                                    <i class="fas fa-trash-alt"></i> Delete
+                                                </button>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+
+            <div class="text-end">
+                <a href="@Url.Action("Dashboard", "Admin")" class="btn btn-outline-secondary">
+                    <i class="fas fa-home me-1"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

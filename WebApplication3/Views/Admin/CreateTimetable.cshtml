@@ -1,0 +1,82 @@
+﻿@model WebApplication3.ViewModels.CreateTimetableViewModel
+
+@{
+    ViewBag.Title = "Create Timetable Entry";
+}
+
+<div class="container">
+    <div class="card shadow-sm mt-4">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">🛠️ Create Timetable Entry</h4>
+        </div>
+        <div class="card-body bg-light">
+
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger">@TempData["Error"]</div>
+            }
+
+            @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+
+            @using (Html.BeginForm("CreateTimetable", "Admin", FormMethod.Post))
+            {
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        @Html.LabelFor(m => m.ClassroomId, new { @class = "form-label fw-semibold" })
+                        @Html.DropDownListFor(m => m.ClassroomId, Model.ClassroomOptions, "-- Select Classroom --", new { @class = "form-select" })
+                    </div>
+
+                    <div class="col-md-4">
+                        @Html.LabelFor(m => m.SubjectId, new { @class = "form-label fw-semibold" })
+                        @Html.DropDownListFor(m => m.SubjectId, Model.SubjectOptions, "-- Select Subject --", new { @class = "form-select", id = "subjectDropdown" })
+                    </div>
+
+                    <div class="col-md-4">
+                        @Html.LabelFor(m => m.TeacherId, new { @class = "form-label fw-semibold" })
+                        @Html.DropDownListFor(m => m.TeacherId, Model.TeacherOptions, "-- Select Teacher --", new { @class = "form-select", id = "teacherDropdown" })
+                    </div>
+
+                    <div class="col-md-4">
+                        @Html.LabelFor(m => m.DayOfWeek, new { @class = "form-label fw-semibold" })
+                        @Html.DropDownListFor(m => m.DayOfWeek, new SelectList(new[] { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday" }), "-- Select Day --", new { @class = "form-select" })
+                    </div>
+
+                    <div class="col-md-4">
+                        @Html.LabelFor(m => m.TimeSlot, new { @class = "form-label fw-semibold" })
+                        @Html.DropDownListFor(m => m.TimeSlot, new SelectList(new[] {
+                            "08:00 - 09:00", "09:00 - 10:00", "10:30 - 11:30", "12:00 - 13:00", "13:00 - 14:00"
+                        }), "-- Select Time --", new { @class = "form-select" })
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save me-1"></i> Save Entry
+                    </button>
+                    <a href="@Url.Action("Dashboard", "Admin")" class="btn btn-outline-secondary">
+                        <i class="fas fa-home me-1"></i> Back to Dashboard
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('#subjectDropdown').change(function () {
+            var subjectId = $(this).val();
+            if (subjectId) {
+                $.getJSON('/Admin/GetTeachersBySubject', { subjectId: subjectId }, function (data) {
+                    var teacherDropdown = $('#teacherDropdown');
+                    teacherDropdown.empty();
+                    teacherDropdown.append($('<option>').text('-- Select Teacher --').attr('value', ''));
+
+                    $.each(data, function (i, teacher) {
+                        teacherDropdown.append($('<option>').text(teacher.Name).attr('value', teacher.Id));
+                    });
+                });
+            }
+        });
+    });
+</script>

@@ -1,0 +1,12 @@
+﻿@model WebApplication3.Models.Student
+
+<h3>Are you sure you want to delete <strong>@Model.FullName</strong>?</h3>
+
+@using (Html.BeginForm("DeleteStudent", "Admin", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.Id)
+
+    <button type="submit" class="btn btn-danger">Yes, Delete</button>
+    <a href="@Url.Action("StudentList", "Admin")" class="btn btn-secondary">Cancel</a>
+}

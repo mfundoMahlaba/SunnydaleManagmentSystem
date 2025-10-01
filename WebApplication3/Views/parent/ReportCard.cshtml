@@ -1,0 +1,200 @@
+﻿@model List<WebApplication3.ViewModels.StudentReportCardViewModel>
+
+@{
+    ViewBag.Title = "Student Report Card";
+    var studentName = ViewBag.StudentName as string;
+    var studentId = ViewBag.StudentId;
+    var academicYear = DateTime.Now.Year;
+    var reportDate = DateTime.Now.ToString("dddd, dd MMMM yyyy");
+}
+
+<style>
+    @@media print {
+        .no-print {
+            display: none !important;
+        }
+    }
+
+    body {
+        background-color: #f8f9fa;
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    .bg-light {
+        background-color: #f1f3f5 !important;
+    }
+
+    .border-bottom {
+        border-bottom: 2px solid #dee2e6 !important;
+    }
+
+    .font-weight-bold {
+        font-weight: 600 !important;
+    }
+
+    .text-uppercase {
+        text-transform: uppercase !important;
+    }
+
+    .text-muted {
+        color: #6c757d !important;
+    }
+
+    .table {
+        font-size: 0.95rem;
+        border-collapse: collapse;
+    }
+
+        .table thead th {
+            background-color: #343a40;
+            color: #fff;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .table td {
+            vertical-align: middle;
+            text-align: center;
+        }
+
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: #f8f9fa;
+    }
+
+    .table-bordered {
+        border: 1px solid #dee2e6;
+    }
+
+    .alert-info {
+        background-color: #e2f0fb;
+        border-color: #bee5eb;
+        color: #0c5460;
+    }
+
+    .btn-danger {
+        font-weight: 500;
+        padding: 0.5rem 1.25rem;
+        font-size: 0.9rem;
+        border-radius: 0.375rem;
+    }
+
+    h4, h5 {
+        font-weight: 700;
+        color: #212529;
+    }
+
+    .container {
+        padding-bottom: 2rem;
+    }
+
+    .text-right {
+        text-align: right !important;
+    }
+
+    .mb-0, .mb-1, .mb-3, .mb-4 {
+        margin-bottom: 1rem !important;
+    }
+
+    .mt-4 {
+        margin-top: 1.5rem !important;
+    }
+
+    .py-3 {
+        padding-top: 1rem !important;
+        padding-bottom: 1rem !important;
+    }
+
+    .px-4 {
+        padding-left: 1.5rem !important;
+        padding-right: 1.5rem !important;
+    }
+
+    .p-3 {
+        padding: 1rem !important;
+    }
+</style>
+
+<div class="container-fluid">
+    <!-- Header Section -->
+    <div class="bg-light border-bottom py-3 px-4 mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 text-uppercase font-weight-bold">Sunnydale Secondary School</h5>
+            <span class="text-muted">@reportDate</span>
+        </div>
+    </div>
+
+    <div class="text-center mb-3">
+        <h4 class="font-weight-bold">Progress Report</h4>
+    </div>
+
+    <div class="border p-3 mb-4">
+        <p class="mb-1"><strong>Student Number:</strong> @studentId</p>
+        <p class="mb-1"><strong>Name:</strong> @studentName</p>
+        <p class="mb-0"><strong>Academic Year:</strong> @academicYear</p>
+    </div>
+
+    <!-- Filter Form -->
+    @using (Html.BeginForm("ReportCard", "Parent", FormMethod.Get))
+    {
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label class="form-label">Filter by Term:</label>
+                <select name="term" class="form-select">
+                    <option value="">All Terms</option>
+                    <option value="Term 1" @(Request.QueryString["term"] == "Term 1" ? "selected" : "")>Term 1</option>
+                    <option value="Term 2" @(Request.QueryString["term"] == "Term 2" ? "selected" : "")>Term 2</option>
+                    <option value="Term 3" @(Request.QueryString["term"] == "Term 3" ? "selected" : "")>Term 3</option>
+                    <option value="Term 4" @(Request.QueryString["term"] == "Term 4" ? "selected" : "")>Term 4</option>
+                </select>
+            </div>
+            <div class="col-md-4 align-self-end">
+                <button type="submit" class="btn btn-primary">Apply Filter</button>
+            </div>
+            <div class="col-md-4 align-self-end text-end">
+                <a href="@Url.Action("ExportToPdf", "Parent")" class="btn btn-danger">
+                    📄 Export to PDF
+                </a>
+            </div>
+        </div>
+    }
+
+    <!-- Report Card Table -->
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">No marks available for this student.</div>
+    }
+    else
+    {
+        var groupedByTerm = Model.GroupBy(m => m.Term);
+
+        foreach (var termGroup in groupedByTerm)
+        {
+            <h5 class="mt-4">🗓️ @termGroup.Key</h5>
+            <table class="table table-bordered table-striped">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Subject</th>
+                        <th>Grade</th>
+                        <th>Test</th>
+                        <th>Exam</th>
+                        <th>Assignment</th>
+                        <th>Average</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in termGroup)
+                    {
+                        <tr>
+                            <td>@item.SubjectName</td>
+                            <td>@item.GradeName</td>
+                            <td>@(item.TestMark.HasValue ? item.TestMark.Value.ToString("F1") : "—")</td>
+                            <td>@(item.ExamMark.HasValue ? item.ExamMark.Value.ToString("F1") : "—")</td>
+                            <td>@(item.AssignmentMark.HasValue ? item.AssignmentMark.Value.ToString("F1") : "—")</td>
+                            <td>@item.Average.ToString("F1")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    }
+</div>

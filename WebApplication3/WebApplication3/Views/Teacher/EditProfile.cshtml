@@ -1,0 +1,78 @@
+﻿@model WebApplication3.ViewModels.TeacherProfileViewModel
+@{
+    ViewBag.Title = "Edit Profile";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="p-5 rounded shadow">
+                <h2 class="text-primary text-center mb-4">👨‍🏫 Update Your Profile</h2>
+
+                @if (TempData["Success"] != null)
+                {
+                    <div id="success-alert" class="alert alert-success text-center" role="alert">
+                        @TempData["Success"]
+                        <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+
+                    <script>
+                        setTimeout(function () {
+                            var alert = document.getElementById('success-alert');
+                            if (alert) {
+                                alert.style.transition = "opacity 0.5s ease-out";
+                                alert.style.opacity = "0";
+                                setTimeout(function () {
+                                    alert.remove();
+                                }, 500);
+                            }
+                        }, 3000);
+                    </script>
+                }
+
+                <div class="mb-3 text-end">
+                    <a href="@Url.Action("Dashboard", "Teacher")" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-home me-1"></i> Back to Dashboard
+                    </a>
+                </div>
+
+                @using (Html.BeginForm("EditProfile", "Teacher", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.HiddenFor(m => m.Id)
+
+                    <div class="mb-3">
+                        @Html.LabelFor(m => m.FullName, new { @class = "form-label fw-semibold" })
+                        @Html.TextBoxFor(m => m.FullName, new { @class = "form-control", placeholder = "Enter full name" })
+                        @Html.ValidationMessageFor(m => m.FullName, "", new { @class = "text-danger small" })
+                    </div>
+
+                    <div class="mb-3">
+                        @Html.LabelFor(m => m.Email, new { @class = "form-label fw-semibold" })
+                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control", type = "email", placeholder = "you@example.com" })
+                        @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger small" })
+                    </div>
+
+                    <div class="mb-3">
+                        @Html.LabelFor(m => m.PhoneNumber, new { @class = "form-label fw-semibold" })
+                        @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control", type = "tel", placeholder = "+27..." })
+                        @Html.ValidationMessageFor(m => m.PhoneNumber, "", new { @class = "text-danger small" })
+                    </div>
+
+                    <div class="mb-3">
+                        @Html.LabelFor(m => m.HomeAddress, new { @class = "form-label fw-semibold" })
+                        @Html.TextBoxFor(m => m.HomeAddress, new { @class = "form-control", placeholder = "Enter home address" })
+                        @Html.ValidationMessageFor(m => m.HomeAddress, "", new { @class = "text-danger small" })
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-save me-2"></i> Update Profile
+                        </button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

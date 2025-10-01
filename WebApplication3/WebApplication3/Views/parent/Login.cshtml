@@ -1,0 +1,63 @@
+﻿@model WebApplication3.ViewModels.ParentLoginViewModel
+
+@{
+    ViewBag.Title = "Parent Login";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4 class="mb-0">👨‍👩‍👧 Parent Login</h4>
+                </div>
+                <div class="card-body">
+
+                    @using (Html.BeginForm("Login", "Parent", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger text-center mb-3" })
+
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.Email, new { @class = "form-label fw-bold text-dark" })
+                            @Html.TextBoxFor(model => model.Email, new { @class = "form-control", placeholder = "Enter your email" })
+                            @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger small" })
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.Password, new { @class = "form-label fw-bold text-dark" })
+                            @Html.PasswordFor(model => model.Password, new { @class = "form-control", placeholder = "Enter your password" })
+                            @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger small" })
+                        </div>
+
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-sign-in-alt me-2"></i> Login
+                            </button>
+                        </div>
+
+                        <div class="text-center mt-3">
+                            @Html.ActionLink("🔐 Forgot Password", "ForgotPassword", "Parent", null, new
+                            {
+                                @class = "text-decoration-none text-primary fw-semibold"
+                            })
+                        </div>
+
+                        <hr class="my-4" />
+
+                        <div class="text-center">
+                            <span class="text-muted">Don't have a parent account?</span><br />
+                            @Html.ActionLink("Sign Up", "Signup", "Parent", null, new
+                            {
+                                @class = "btn btn-outline-primary mt-2"
+                            })
+                        </div>
+                    }
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

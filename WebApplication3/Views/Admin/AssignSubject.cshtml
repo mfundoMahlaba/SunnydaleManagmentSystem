@@ -1,0 +1,52 @@
+﻿@model WebApplication3.Models.Subject
+@{
+    ViewBag.Title = "Assign Subject to Stream";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="bg-light p-5 rounded shadow">
+                <h2 class="text-primary text-center mb-4">Assign Subject to Stream</h2>
+
+
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        @TempData["SuccessMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+
+                @using (Html.BeginForm())
+                {
+
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger mb-3 text-center" })
+
+                    <div class="mb-3">
+                        @Html.LabelFor(model => model.Name, new { @class = "form-label text-primary" })
+                        @Html.TextBoxFor(model => model.Name, new { @class = "form-control", @placeholder = "e.g. Mathematics" })
+                        @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="mb-3">
+                        @Html.LabelFor(model => model.SubjectCode, new { @class = "form-label text-primary" })
+                        @Html.TextBoxFor(model => model.SubjectCode, new { @class = "form-control", @placeholder = "e.g. MATH101" })
+                        @Html.ValidationMessageFor(model => model.SubjectCode, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="mb-3">
+                        @Html.Label("Stream", new { @class = "form-label text-primary" })
+                        @Html.DropDownList("StreamId", ViewBag.Streams as SelectList, "-- Select Stream --", new { @class = "form-control" })
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <input type="submit" value="Assign Subject" class="btn btn-primary btn-lg" />
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

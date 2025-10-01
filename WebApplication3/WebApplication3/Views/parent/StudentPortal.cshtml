@@ -1,0 +1,18 @@
+﻿<h4>📄 Report Card for @Model.StudentName (@Model.Grade)</h4>
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>Subject</th>
+            <th>Mark</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var mark in Model.Marks)
+        {
+            <tr>
+                <td>@mark.SubjectName</td>
+                <td>@mark.Score</td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,73 @@
+﻿@model List<WebApplication3.ViewModels.TeacherAssignmentOverviewViewModel>
+@{
+    var grades = ViewBag.Grades as SelectList;
+}
+
+<div class="card p-4">
+    <h4>Teacher Subject Assignments</h4>
+
+    <!-- Filter Form -->
+    <form id="filterForm" class="form-inline mb-3">
+        <input type="text" name="teacherName" class="form-control mr-2" placeholder="Filter by teacher name" />
+        @Html.DropDownList("gradeId", grades, "Filter by grade", new { @class = "form-control mr-2" })
+        <button type="submit" class="btn btn-primary">Apply Filters</button>
+    </form>
+
+    <!-- Success Message -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+
+
+    <!-- Assignment Table -->
+    <div id="assignmentTable" class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>Teacher</th>
+                    <th>Subject</th>
+                    <th>Code</th>
+                    <th>Grade</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.TeacherName</td>
+                        <td>@item.SubjectName</td>
+                        <td>@item.SubjectCode</td>
+                        <td>@item.GradeName</td>
+                        <td>
+                            <a href="@Url.Action("EditAssignment", new { id = item.AssignmentId })" class="btn btn-sm btn-warning">Edit</a>
+                            <a href="@Url.Action("DeleteAssignment", new { id = item.AssignmentId })" class="btn btn-sm btn-danger"
+                               onclick="return confirm('Are you sure you want to delete this assignment?');">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <a href="@Url.Action("Dashboard", "Admin")" class="btn btn-outline-secondary">
+        <i class="fas fa-home"></i> Back to Dashboard
+    </a>
+</div>
+
+@section Scripts {
+    <script>
+        $("#filterForm").submit(function (e) {
+            e.preventDefault();
+            $.ajax({
+                url: '@Url.Action("FilterAssignments", "Admin")',
+                type: 'GET',
+                data: $(this).serialize(),
+                success: function (result) {
+                    $("#assignmentTable").html(result);
+                }
+            });
+        });
+    </script>
+}
+

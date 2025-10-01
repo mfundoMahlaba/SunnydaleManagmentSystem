@@ -1,0 +1,92 @@
+﻿@model WebApplication3.ViewModels.PaymentSuccessViewModel
+
+@{
+    ViewBag.Title = "Payment Successful";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-check-circle me-2"></i>Payment Successful
+                    </h4>
+                </div>
+                <div class="card-body text-center">
+                    <!-- Success Icon -->
+                    <div class="mb-4">
+                        <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
+                    </div>
+
+                    <h3 class="text-success mb-4">Thank You for Your Payment!</h3>
+
+                    <!-- Payment Details -->
+                    <div class="row justify-content-center mb-4">
+                        <div class="col-md-8">
+                            <div class="alert alert-success">
+                                <div class="row">
+                                    <div class="col-12 mb-3">
+                                        <h5>Payment Confirmation</h5>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p><strong>Student Name:</strong></p>
+                                        <p><strong>Amount Paid:</strong></p>
+                                        <p><strong>Payment Date:</strong></p>
+                                        <p><strong>Status:</strong></p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p>@Model.FullName</p>
+                                        <p class="text-success">R@(Model.Amount.ToString("N2"))</p>
+                                        <p>@Model.PaymentDate.ToString("dd MMMM yyyy 'at' HH:mm")</p>
+                                        <p><span class="badge bg-success">@Model.Status</span></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(Model.TransactionId))
+                            {
+                                <div class="alert alert-info">
+                                    <strong>Transaction ID:</strong>
+                                    <code class="ms-2">@Model.TransactionId</code>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Next Steps -->
+                    <div class="mb-4">
+                        <h5>What's Next?</h5>
+                        <p class="text-muted">
+                            Your tuition payment has been processed successfully.
+                        </p>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-grid gap-2 d-md-block">
+                        <a href="@Url.Action("Dashboard", "Student")" class="btn btn-primary btn-lg me-md-2">
+                            <i class="fas fa-tachometer-alt me-2"></i>Return to Dashboard
+                        </a>
+
+                    </div>
+
+                    <!-- Additional Info -->
+                    <div class="mt-4 small text-muted">
+
+                        <p>If you have any questions, please contact the administration office.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>// Add some celebratory effects
+        $(document).ready(function () {
+            // Confetti effect (optional)
+            setTimeout(function() {
+                $('.fa-check-circle').addClass('animate__animated animate__bounceIn');
+            }, 500);
+        });</script>
+}

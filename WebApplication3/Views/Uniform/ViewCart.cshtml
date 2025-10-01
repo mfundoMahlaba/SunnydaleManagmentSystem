@@ -1,0 +1,103 @@
+﻿@model List<WebApplication3.Models.CartItemVm>
+@{
+    ViewBag.Title = "Shopping Cart";
+}
+
+<div class="container mt-4">
+    <h2>Your Shopping Cart</h2>
+
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-info">@TempData["Message"]</div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-warning">
+            <p>Your cart is empty.</p>
+            <a href="@Url.Action("Index")" class="btn btn-primary">Continue Shopping</a>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Size</th>
+                                    <th>Price</th>
+                                    <th>Quantity</th>
+                                    <th>Total</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(item.ImagePath))
+                                            {
+                                                <img src="@Url.Content(item.ImagePath)"
+                                                     alt="@item.Name"
+                                                     style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px;" />
+                                            }
+                                            @item.Name
+                                        </td>
+                                        <td>@item.Size</td>
+                                        <td>@item.UnitPrice.ToString("C")</td>
+                                        <td>
+                                            @using (Html.BeginForm("UpdateCartQuantity", "Uniform", FormMethod.Post))
+                                            {
+                                                @Html.AntiForgeryToken()
+                                                @Html.Hidden("id", item.ItemId)
+                                                @Html.Hidden("size", item.Size)
+                                                <div class="input-group" style="width: 120px;">
+                                                    <input type="number" name="quantity" value="@item.Quantity"
+                                                           min="1" max="100" class="form-control form-control-sm" />
+                                                    <div class="input-group-append">
+                                                        <button type="submit" class="btn btn-sm btn-outline-secondary">Update</button>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </td>
+                                        <td>@((item.Quantity * item.UnitPrice).ToString("C"))</td>
+                                        <td>
+                                            @using (Html.BeginForm("RemoveFromCart", "Uniform", FormMethod.Post))
+                                            {
+                                                @Html.AntiForgeryToken()
+                                                @Html.Hidden("id", item.ItemId)
+                                                @Html.Hidden("size", item.Size)
+                                                <button type="submit" class="btn btn-sm btn-danger">Remove</button>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5>Order Summary</h5>
+                        <hr>
+                        <p><strong>Total Items:</strong> @Model.Sum(i => i.Quantity)</p>
+                        <p><strong>Total Amount:</strong> @Model.Sum(i => i.Quantity * i.UnitPrice).ToString("C")</p>
+                        <hr>
+                        <div class="d-grid gap-2">
+                            <a href="@Url.Action("Index")" class="btn btn-outline-secondary">Continue Shopping</a>
+                            <a href="@Url.Action("Checkout", "Uniform")" class="btn btn-success">Proceed to Payment</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

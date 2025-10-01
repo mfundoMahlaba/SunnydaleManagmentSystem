@@ -1,0 +1,90 @@
+﻿@using (Html.BeginForm())
+{@Html.AntiForgeryToken()}
+
+<style>
+    body {
+        font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    }
+
+    .faceauth-card {
+        width: 420px;
+        max-width: 95%;
+        margin: 40px auto;
+        padding: 20px;
+        background: #fff;
+        border-radius: 14px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        text-align: center;
+    }
+
+        .faceauth-card h2 {
+            margin-bottom: 12px;
+            font-size: 1.3rem;
+            color: #0f172a;
+        }
+
+        .faceauth-card video {
+            border-radius: 12px;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+            margin-bottom: 12px;
+        }
+
+    #status {
+        margin-top: 10px;
+        font-weight: 600;
+        color: #0f172a;
+        min-height: 24px;
+    }
+
+    .faceauth-card small {
+        display: block;
+        margin-top: 6px;
+        color: #64748b;
+        font-size: 0.85rem;
+    }
+</style>
+
+<div class="faceauth-card">
+    <h2>Register Face</h2>
+    <video id="video" autoplay playsinline width="360" height="270"></video>
+    <canvas id="canvas" width="360" height="270" style="display:none;"></canvas>
+    <div id="status"></div>
+    <small>Ensure good lighting and keep your face centered.</small>
+</div>
+
+<script>
+(function(){
+    const video = document.getElementById("video");
+    const canvas = document.getElementById("canvas");
+    const status = document.getElementById("status");
+    const token = document.querySelector("input[name='__RequestVerificationToken']").value;
+
+    navigator.mediaDevices.getUserMedia({ video:true }).then(stream => {
+        video.srcObject = stream;
+        setTimeout(capture, 1000);
+    });
+
+    function capture(){
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(video,0,0,canvas.width,canvas.height);
+        const dataUrl = canvas.toDataURL("image/jpeg");
+        const base64 = dataUrl.split(",")[1];
+
+        fetch(window.location.href,{
+            method:"POST",
+            headers:{ "Content-Type":"application/x-www-form-urlencoded" },
+            body:"__RequestVerificationToken="+encodeURIComponent(token)+"&imageBase64="+encodeURIComponent(base64)
+        })
+        .then(r=>r.json())
+        .then(j=>{
+            if(j.success){
+                status.innerText = "Face registered successfully. Please login again.";
+                setTimeout(() => { location.href = '@Url.Action("Login")'; }, 1500);
+            }else{
+                status.innerText=j.message;
+                setTimeout(capture,1500);
+            }
+        });
+    }
+})();
+</script>

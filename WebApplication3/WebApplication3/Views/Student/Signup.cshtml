@@ -1,0 +1,91 @@
+﻿@model WebApplication3.ViewModels.StudentSignupViewModel
+@{
+    ViewBag.Title = "Student Sign Up";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4 class="mb-0">Student Sign Up</h4>
+                </div>
+                <div class="card-body">
+
+                    @using (Html.BeginForm())
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger text-center mb-3" })
+
+                     <div class="row g-3">
+                        <div class="col-md-6">
+                            @Html.LabelFor(model => model.IDNumber, new { @class = "form-label fw-bold text-dark" })
+                            @Html.TextBoxFor(model => model.IDNumber, new { @class = "form-control", @placeholder = "ID Number" })
+                            @Html.ValidationMessageFor(model => model.IDNumber, "", new { @class = "text-danger small" })
+                        </div>
+
+                        <div class="col-md-6">
+                            @Html.LabelFor(model => model.FullName, new { @class = "form-label fw-bold text-dark" })
+                            @Html.TextBoxFor(model => model.FullName, new { @class = "form-control", @placeholder = "Full Name" })
+                            @Html.ValidationMessageFor(model => model.FullName, "", new { @class = "text-danger small" })
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.Gender, new { @class = "form-label fw-bold text-dark" })
+                            @Html.DropDownListFor(m => m.Gender, Model.GenderOptions, "-- Select Gender --", new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Gender, "", new { @class = "text-danger small" })
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.Race, new { @class = "form-label fw-bold text-dark" })
+                            @Html.DropDownListFor(m => m.Race, Model.RaceOptions, "-- Select Race --", new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Race, "", new { @class = "text-danger small" })
+                        </div>
+
+                        <div class="col-md-6">
+                            @Html.LabelFor(model => model.PhoneNumber, new { @class = "form-label fw-bold text-dark" })
+                            @Html.TextBoxFor(model => model.PhoneNumber, new { @class = "form-control", @placeholder = "Phone Number" })
+                            @Html.ValidationMessageFor(model => model.PhoneNumber, "", new { @class = "text-danger small" })
+                        </div>
+
+                        <div class="col-md-6">
+                            @Html.LabelFor(model => model.AlternativePhoneNumber, new { @class = "form-label fw-bold text-dark" })
+                            @Html.TextBoxFor(model => model.AlternativePhoneNumber, new { @class = "form-control", @placeholder = "Alternative Phone Number" })
+                            @Html.ValidationMessageFor(model => model.AlternativePhoneNumber, "", new { @class = "text-danger small" })
+                        </div>
+                        <div class="col-md-6">
+                            @Html.LabelFor(model => model.Address, new { @class = "form-label fw-bold text-dark" })
+                            @Html.TextBoxFor(model => model.Address, new { @class = "form-control", @placeholder = "Home Address" })
+                            @Html.ValidationMessageFor(model => model.Address, "", new { @class = "text-danger small" })
+                        </div>
+
+                        <div class="col-md-6">
+                            @Html.LabelFor(model => model.Email, new { @class = "form-label fw-bold text-dark" })
+                            @Html.TextBoxFor(model => model.Email, new { @class = "form-control", @placeholder = "Email Address" })
+                            @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger small" })
+                        </div>
+
+                        <div class="col-md-6">
+                            @Html.LabelFor(model => model.Password, new { @class = "form-label fw-bold text-dark" })
+                            @Html.PasswordFor(model => model.Password, new { @class = "form-control", @placeholder = "Password" })
+                            @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger small" })
+                        </div>
+
+                        <div class="col-md-6">
+                            @Html.LabelFor(model => model.ConfirmPassword, new { @class = "form-label fw-bold text-dark" })
+                            @Html.PasswordFor(model => model.ConfirmPassword, new { @class = "form-control", @placeholder = "Confirm Password" })
+                            @Html.ValidationMessageFor(model => model.ConfirmPassword, "", new { @class = "text-danger small" })
+                        </div>
+                    </div>
+
+                        <div class="mt-4 text-center">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-user-plus me-2"></i> Register Account
+                            </button>
+                        </div>
+                    }
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

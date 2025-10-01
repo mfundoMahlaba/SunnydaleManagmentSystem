@@ -1,0 +1,63 @@
+﻿@model List<WebApplication3.ViewModels.PendingDocumentsByStudentViewModel>
+
+<div class="container">
+    <div class="card shadow-sm mt-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">📄 Pending Documents</h4>
+            <a href="@Url.Action("Dashboard", "Admin")" class="btn btn-outline-secondary">
+                <i class="fas fa-home me-1"></i> Back to Dashboard
+            </a>
+        </div>
+        <div class="card-body">
+
+            @if (!Model.Any())
+            {
+                <div class="alert alert-info">No pending documents found.</div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Student</th>
+                                <th>Documents</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var studentGroup in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <strong>@studentGroup.Student.FullName</strong><br />
+                                        <small class="text-muted">ID: @studentGroup.Student.Id</small>
+                                    </td>
+                                    <td>
+                                        <ul class="list-unstyled mb-0">
+                                            @foreach (var doc in studentGroup.Documents)
+                                            {
+                                                <li>
+                                                    <a href="@Url.Content(doc.FilePath)" target="_blank" class="text-decoration-none">
+                                                        <i class="fas fa-file-alt me-1"></i> @doc.FileName
+                                                    </a>
+                                                    <span class="badge bg-secondary ms-2">@doc.DocumentType</span>
+                                                </li>
+                                            }
+                                        </ul>
+                                    </td>
+                                    <td>
+                                        <a href="@Url.Action("ReviewStudent", "Admin", new { studentId = studentGroup.Student.Id })"
+                                           class="btn btn-sm btn-outline-info">
+                                            <i class="fas fa-user-check me-1"></i> Review Student
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>

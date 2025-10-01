@@ -1,0 +1,29 @@
+﻿@model List<WebApplication3.ViewModels.TeacherAssignmentOverviewViewModel>
+
+<table class="table table-bordered table-striped table-responsive">
+    <thead class="thead-dark">
+        <tr>
+            <th>Teacher</th>
+            <th>Subject</th>
+            <th>Code</th>
+            <th>Grade</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.TeacherName</td>
+                <td>@item.SubjectName</td>
+                <td>@item.SubjectCode</td>
+                <td>@item.GradeName</td>
+                <td>
+                    <a href="@Url.Action("EditAssignment", new { id = item.AssignmentId })" class="btn btn-sm btn-warning">Edit</a>
+                    <a href="@Url.Action("DeleteAssignment", new { id = item.AssignmentId })" class="btn btn-sm btn-danger"
+                       onclick="return confirm('Are you sure you want to delete this assignment?');">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

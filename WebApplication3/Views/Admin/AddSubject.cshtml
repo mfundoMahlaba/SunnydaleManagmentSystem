@@ -1,0 +1,81 @@
+﻿@model WebApplication3.ViewModels.SubjectViewModel
+@{
+    ViewBag.Title = "Add Subject";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4 class="mb-0 fw-semibold">📘 Add New Subject</h4>
+                </div>
+                <div class="card-body bg-light">
+
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div id="success-alert" class="alert alert-success text-center" role="alert">
+                            @TempData["SuccessMessage"]
+                        </div>
+
+                        <script>
+                            setTimeout(function () {
+                                var alert = document.getElementById('success-alert');
+                                if (alert) {
+                                    alert.style.transition = "opacity 0.5s ease-out";
+                                    alert.style.opacity = "0";
+                                    setTimeout(function () {
+                                        alert.remove();
+                                    }, 500);
+                                }
+                            }, 3000);
+                        </script>
+                    }
+
+                    @using (Html.BeginForm("AddSubject", "Admin", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger mb-3 text-center" })
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                @Html.LabelFor(m => m.Name, new { @class = "form-label fw-semibold text-primary" })
+                                @Html.TextBoxFor(m => m.Name, new { @class = "form-control", placeholder = "e.g. Mathematics" })
+                                @Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger small" })
+                            </div>
+                            <div class="col-md-6">
+                                @Html.LabelFor(m => m.SubjectCode, new { @class = "form-label fw-semibold text-primary" })
+                                @Html.TextBoxFor(m => m.SubjectCode, new { @class = "form-control", placeholder = "e.g. MATH101" })
+                                @Html.ValidationMessageFor(m => m.SubjectCode, "", new { @class = "text-danger small" })
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                @Html.LabelFor(m => m.GradeId, "Grade", new { @class = "form-label fw-semibold text-primary" })
+                                @Html.DropDownListFor(m => m.GradeId, Model.GradeOptions, "-- Select Grade --", new { @class = "form-select" })
+                                @Html.ValidationMessageFor(m => m.GradeId, "", new { @class = "text-danger small" })
+                            </div>
+                            <div class="col-md-6">
+                                @Html.LabelFor(m => m.StreamId, "Stream", new { @class = "form-label fw-semibold text-primary" })
+                                @Html.DropDownListFor(m => m.StreamId, Model.StreamOptions, "-- Select Stream --", new { @class = "form-select" })
+                                @Html.ValidationMessageFor(m => m.StreamId, "", new { @class = "text-danger small" })
+                            </div>
+                        </div>
+
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary btn-lg px-4">
+                                <i class="fas fa-save me-2"></i> Save Subject
+                            </button>
+                        </div>
+
+                        <div class="text-center mt-3">
+                            @Html.ActionLink("← Back to Admin Dashboard", "Dashboard", "Admin", null, new { @class = "btn btn-outline-secondary btn-sm" })
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

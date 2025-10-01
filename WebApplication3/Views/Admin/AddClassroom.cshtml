@@ -1,0 +1,77 @@
+﻿@model WebApplication3.Models.Classroom
+@{
+    ViewBag.Title = "Add Classroom";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="bg-light p-5 rounded shadow">
+                <h2 class="text-primary text-center mb-4">Add New Classroom</h2>
+
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div id="success-alert" class="alert alert-success text-center" role="alert">
+                        @TempData["SuccessMessage"]
+                    </div>
+
+                    <script>
+                        setTimeout(function () {
+                            var alert = document.getElementById('success-alert');
+                            if (alert) {
+                                alert.style.transition = "opacity 0.5s ease-out";
+                                alert.style.opacity = "0";
+                                setTimeout(function () {
+                                    alert.remove();
+                                }, 500);
+                            }
+                        }, 3000);
+                    </script>
+                }
+
+                @using (Html.BeginForm())
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger mb-3 text-center" })
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            @Html.LabelFor(m => m.Name, new { @class = "form-label text-primary" })
+                            @Html.TextBoxFor(m => m.Name, new { @class = "form-control", placeholder = "e.g. Grade 8A" })
+                            @Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="col-md-6">
+                            @Html.LabelFor(m => m.Capacity, new { @class = "form-label text-primary" })
+                            @Html.TextBoxFor(m => m.Capacity, new { @class = "form-control", type = "number", min = "1" })
+                            @Html.ValidationMessageFor(m => m.Capacity, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            @Html.LabelFor(m => m.GradeId, new { @class = "form-label text-primary" })
+                            @Html.DropDownListFor(m => m.GradeId, (SelectList)ViewBag.Grades, "-- Select Grade --", new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.GradeId, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="col-md-6">
+                            @Html.LabelFor(m => m.StreamId, new { @class = "form-label text-primary" })
+                            @Html.DropDownListFor(m => m.StreamId, (SelectList)ViewBag.Streams, "-- Select Stream --", new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.StreamId, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-save"></i> Add Classroom
+                        </button>
+                    </div>
+
+                    <div class="text-center mt-3">
+                        @Html.ActionLink("← Back to Admin Dashboard", "Dashboard", "Admin", null, new { @class = "btn btn-outline-secondary btn-sm" })
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

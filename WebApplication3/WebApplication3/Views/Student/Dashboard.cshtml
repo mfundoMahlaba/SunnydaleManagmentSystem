@@ -1,0 +1,132 @@
+﻿@model WebApplication3.ViewModels.StudentDashboardViewModel
+@{
+    ViewBag.Title = "Student Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<!-- Mobile Toggle Button -->
+<button class="btn btn-outline-dark d-md-none m-2" onclick="toggleSidebar()">
+    ☰ Menu
+</button>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav id="sidebar" class="col-md-3 col-12 bg-dark text-white vh-100 sticky-top d-none d-md-block" style="overflow-y:auto;">
+            <div class="px-3 py-4">
+                <h4 class="text-center border-bottom pb-3 mb-4">Student Panel</h4>
+
+                <!-- Dashboard Shortcut -->
+                <div class="text-center mb-4">
+                    @Html.ActionLink("🏠 Dashboard", "Dashboard", "Student", null, new { @class = "btn btn-primary w-75" })
+                </div>
+
+                <!-- Section: Academic -->
+                <button class="btn btn-dark w-100 text-start mb-2" onclick="toggleMenu('academicMenu')">
+                    🎓 Enrollments
+                </button>
+                <div id="academicMenu" class="submenu ps-3" style="display:none;">
+                    @Html.ActionLink("Capture Subjects & Marks", "Capture", "Student", null, new { @class = "d-block py-2 text-white text-decoration-none" })
+                    @Html.ActionLink("Documents", "UploadDocuments", "Student", null, new { @class = "d-block py-2 text-white text-decoration-none" })
+                    @if (Model.CanPayFees)
+                    {
+                        <div class="my-3">
+                            @Html.ActionLink("Pay Tuition Fee", "TuitionPayment", "Student", null, new { @class = "d-block py-2 text-white text-decoration-none" })
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning mt-3">
+                            Only approved students can pay Tuition!
+                        </div>
+                    }
+                    @if (Model.HasPaid)
+                    {
+                        @Html.ActionLink("Submit Enrollment", "EnrollSubjects", "Student", null, new { @class = "d-block py-2 text-white text-decoration-none" })
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning mt-3">
+                            You must pay your tuition before submitting enrollment.
+                        </div>
+                    }
+
+                </div>
+
+                <a href="@Url.Action("MyResults", "Student")" class="btn btn-dark w-100 text-start mb-2">
+                    <i class="fas fa-history me-2"></i> View Academic History
+                </a>
+
+                <a href="@Url.Action("MyEnrolledSubjects", "Student")" class="btn btn-dark w-100 text-start mb-2">
+                    <i class="fas fa-book-open me-2"></i> My Enrolled Subjects
+                </a>
+
+                <a href="@Url.Action("ReportCard", "Student")" class="btn btn-dark w-100 text-start mb-2">
+                    <i class="fas fa-chart-line me-2"></i> Progress Report
+                </a>
+
+                @Html.ActionLink("📝 View Learning Materials", "ViewMaterials", "Student", null, new { @class = "btn btn-dark w-100 text-start mb-2" })
+
+                <a href="@Url.Action("MyAttendance", "Student")" class="btn btn-dark w-100 text-start mb-2">
+                    <i class="fas fa-calendar-check me-2"></i> My Attendance History
+                </a>
+
+                <a href="@Url.Action("ClassTimetable", "Student")" class="btn btn-dark w-100 text-start mb-2">
+                    <i class="fas fa-calendar-alt me-2"></i> Class Timetables
+                </a>
+
+
+                <a href="@Url.Action("EditProfile", "Student")" class="btn btn-dark w-100 text-start mb-2">
+                    <i class="fas fa-user-edit me-2"></i> Update Profile
+                </a>
+
+            </div>
+        </nav>
+
+
+        <!-- Main Content -->
+        <main class="col-md-9 col-12 pt-4">
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger">@TempData["Error"]</div>
+            }
+
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-light text-dark">
+                    <h4 class="mb-0">Welcome, @Model.FullName</h4>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h5>Student Details</h5>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item"><strong>Student ID:</strong> @Model.Id</li>
+                            <li class="list-group-item"><strong>ID Number:</strong> @Model.IDNumber</li>
+                            <li class="list-group-item"><strong>Full Name:</strong> @Model.FullName</li>
+                            <li class="list-group-item"><strong>Email:</strong> @Model.Email</li>
+                            <li class="list-group-item"><strong>Contact Number:</strong> @Model.PhoneNumber</li>
+                            <li class="list-group-item"><strong>Status:</strong> @Model.LatestDocumentStatus
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+    function toggleMenu(menuId) {
+        const menu = document.getElementById(menuId);
+        menu.style.display = menu.style.display === "block" ? "none" : "block";
+    }
+    function toggleSidebar() {
+        const sidebar = document.getElementById("sidebar");
+        sidebar.classList.toggle("d-none");
+    }
+</script>
+

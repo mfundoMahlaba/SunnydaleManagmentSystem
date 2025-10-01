@@ -1,0 +1,137 @@
+﻿@model List<WebApplication3.ViewModels.TimetableEntryViewModel>
+
+@{
+    ViewBag.Title = "Class Timetable";
+    var selectedClassroomId = Request.QueryString["classroomId"];
+    var days = new[] { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday" };
+    var slots = new[] { "08:00 - 09:00", "09:00 - 10:00", "10:30 - 11:30", "12:00 - 13:00", "13:00 - 14:00" };
+}
+
+<style>
+    .timetable-grid {
+        display: grid;
+        grid-template-columns: 150px repeat(5, 1fr);
+        border: 1px solid #ccc;
+        margin-top: 1rem;
+        overflow-x: auto;
+    }
+
+        .timetable-grid > div {
+            border: 1px solid #ddd;
+            padding: 8px;
+            min-height: 100px;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+    .header {
+        background-color: #343a40;
+        color: white;
+        font-weight: bold;
+    }
+
+    .slot-label {
+        background-color: #f8f9fa;
+        font-weight: bold;
+    }
+
+    .entry {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+    }
+
+    @@media (max-width: 768px) {
+        .timetable-grid {
+            grid-template-columns: 120px repeat(5, 1fr);
+            font-size: 0.8rem;
+        }
+
+        .entry {
+            font-size: 0.75rem;
+        }
+    }
+</style>
+
+<div class="container">
+    <div class="card shadow-sm mt-4">
+        <div class="card-header">
+            <h4 class="mb-0">📅 Class Timetable</h4>
+        </div>
+        <div class="card-body">
+
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success">@TempData["Success"]</div>
+            }
+
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger">@TempData["Error"]</div>
+            }
+
+            <!-- Filter Form -->
+            <form method="get" action="@Url.Action("ClassTimetable", "Student")" class="row g-3 mb-4">
+                <div class="col-md-6 col-lg-4">
+                    <label for="classroomId" class="form-label">Filter by Classroom:</label>
+                    <select name="classroomId" class="form-select">
+                        <option value="">All Classrooms</option>
+                        @foreach (var classroom in ViewBag.ClassroomOptions as List<SelectListItem>)
+                        {
+                            <option value="@classroom.Value" @(classroom.Selected ? "selected" : "")>
+                                @classroom.Text
+                            </option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-6 col-lg-4 align-self-end">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-filter me-1"></i> Apply Filter
+                    </button>
+                </div>
+            </form>
+
+            <!-- Timetable Grid -->
+            @if (!Model.Any())
+            {
+                <div class="alert alert-info">No timetable entries found for the selected classroom.</div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <div class="timetable-grid">
+                        <div class="header">Time</div>
+                        @foreach (var day in days)
+                        {
+                            <div class="header">@day</div>
+                        }
+
+                        @foreach (var slot in slots)
+                        {
+                            <div class="slot-label">@slot</div>
+                            foreach (var day in days)
+                            {
+                                var entry = Model.FirstOrDefault(e => e.DayOfWeek == day && e.TimeSlot == slot);
+                                if (entry != null)
+                                {
+                                    <div class="entry">
+                                        <div><strong>Subject:</strong> @entry.SubjectName</div>
+                                        <div><strong>Teacher:</strong> @entry.TeacherName</div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div></div>
+                                }
+                            }
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+        <a href="@Url.Action("Dashboard", "Student")" class="btn btn-outline-secondary">
+            <i class="fas fa-home me-1"></i> Back to Dashboard
+        </a>
+    </div>
+</div>

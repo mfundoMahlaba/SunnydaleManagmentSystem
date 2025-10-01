@@ -1,0 +1,45 @@
+﻿@model List<WebApplication3.ViewModels.EnrolledGradeViewModel>
+
+<div class="container mt-4">
+    <h4>My Enrolled Subjects</h4>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">You have not enrolled in any subjects yet.</div>
+    }
+    else
+    {
+        foreach (var grade in Model)
+        {
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    Grade: @grade.GradeName
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Subject Code</th>
+                                <th>Subject Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var subject in grade.Subjects)
+                            {
+                                <tr>
+                                    <td>@subject.SubjectCode</td>
+                                    <td>@subject.SubjectName</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+    }
+</div>
+<div class="mb-3 text-end">
+    <a href="@Url.Action("Dashboard", "Student")" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-house-door"></i> Back to Dashboard
+    </a>
+</div>

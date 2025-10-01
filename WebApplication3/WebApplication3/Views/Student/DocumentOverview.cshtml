@@ -1,0 +1,82 @@
+﻿@model PagedList.IPagedList<WebApplication3.Models.EnrollmentDocument>
+@using PagedList.Mvc;
+@{
+    ViewBag.Title = "My Uploaded Documents";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-4">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white text-center">
+            <h4 class="mb-0">My Uploaded Documents</h4>
+        </div>
+
+        <div class="card-body">
+            @if (!Model.Any())
+            {
+                <p class="text-muted text-center">You haven't uploaded any documents yet.</p>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Document Type</th>
+                                <th>Status</th>
+                                <th>Uploaded</th>
+                                <th>View</th>
+                                <th>Download</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var doc in Model)
+                            {
+                                <tr>
+                                    <td>@doc.DocumentType</td>
+                                    <td>
+                                        @if (doc.Status == "Approved")
+                                        {
+                                            <span class="badge bg-success">@doc.Status</span>
+                                        }
+                                        else if (doc.Status == "Rejected")
+                                        {
+                                            <span class="badge bg-danger">@doc.Status</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">@doc.Status</span>
+                                        }
+                                    </td>
+                                    <td>@doc.UploadedAt.ToString("yyyy-MM-dd")</td>
+                                    <td>
+                                        <a href="@Url.Content(doc.FilePath)" target="_blank" class="btn btn-sm btn-outline-primary">View</a>
+                                    </td>
+                                    <td>
+                                        <a href="@Url.Content(doc.FilePath)" download class="btn btn-sm btn-outline-success">Download</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                    <div class="text-center mt-4">
+                        @Html.PagedListPager(Model, page => Url.Action("DocumentOverview", new { page }), new PagedListRenderOptions
+                        {
+                            DisplayLinkToFirstPage = PagedListDisplayMode.Always,
+                            DisplayLinkToLastPage = PagedListDisplayMode.Always,
+                            DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+                            DisplayLinkToNextPage = PagedListDisplayMode.Always,
+                            DisplayLinkToIndividualPages = true,
+                            DisplayPageCountAndCurrentLocation = false,
+                            MaximumPageNumbersToDisplay = 5,
+                            UlElementClasses = new[] { "pagination justify-content-center" },
+                            LiElementClasses = new[] { "page-item" },
+                            //PageClasses = new[] { "page-link" }
+                        })
+                    </div>
+                    }
+                </div>
+            </div>
+
+</div>

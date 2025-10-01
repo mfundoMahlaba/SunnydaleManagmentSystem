@@ -1,0 +1,69 @@
+﻿@model List<WebApplication3.ViewModels.TeacherTimetableViewModel>
+
+@{
+    ViewBag.Title = "Week Overview";
+    var days = new[] { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday" };
+    var timeSlots = Model.Select(m => m.TimeSlot).Distinct().OrderBy(t => t).ToList();
+}
+
+<div class="container py-4">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0 fw-semibold">📅 Week Overview</h4>
+        </div>
+        <div class="card-body bg-light">
+            @if (!Model.Any())
+            {
+                <div class="alert alert-info text-center fw-semibold">No timetable entries found.</div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover text-center align-middle">
+                        <thead class="table-primary">
+                            <tr>
+                                <th class="bg-light text-primary">Time Slot</th>
+                                @foreach (var day in days)
+                                {
+                                    <th class="text-primary">@day</th>
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var slot in timeSlots)
+                            {
+                                <tr>
+                                    <td class="fw-bold text-dark">@slot</td>
+                                    @foreach (var day in days)
+                                    {
+                                        var entry = Model
+                                            .FirstOrDefault(m => string.Equals(m.DayOfWeek, day, StringComparison.OrdinalIgnoreCase) && m.TimeSlot == slot);
+
+                                        if (entry != null)
+                                        {
+                                            <td class="bg-white">
+                                                <div class="fw-semibold text-success">@entry.SubjectName</div>
+                                                <div class="text-muted small">@entry.GradeName</div>
+                                                <div class="text-muted small">@entry.ClassroomName</div>
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td class="text-muted">–</td>
+                                        }
+                                    }
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                
+            }
+        </div>
+        <div class="card-footer text-end">
+            <a href="@Url.Action("Dashboard", "Teacher")" class="btn btn-outline-secondary">
+                <i class="fas fa-home me-1"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>

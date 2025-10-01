@@ -1,0 +1,25 @@
+﻿@model WebApplication3.ViewModels.AssignSubjectsViewModel
+
+<div class="card p-4">
+    <h4>Edit Subject Assignment</h4>
+
+    @using (Html.BeginForm())
+    {
+        <div class="form-group">
+            @Html.LabelFor(m => m.SelectedTeacherId)
+            @Html.DropDownListFor(m => m.SelectedTeacherId, Model.Teachers, "Select Teacher", new { @class = "form-control" })
+        </div>
+
+        <div class="form-group">
+            @Html.Label("Subjects")
+            @Html.ListBoxFor(m => m.SelectedSubjectIds, Model.Subjects, new { @class = "form-control", size = 6 })
+        </div>
+
+        <div class="form-group">
+            @Html.Label("Grades")
+            @Html.ListBoxFor(m => m.SelectedGradeIds, Model.Grades, new { @class = "form-control", size = 6 })
+        </div>
+
+        <button type="submit" class="btn btn-success">Update Assignment</button>
+    }
+</div>

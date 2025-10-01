@@ -1,0 +1,250 @@
+﻿@model WebApplication3.ViewModels.EnrollmentViewModel
+
+<!-- Previous Results Section -->
+@if (Model.PreviousResults != null && Model.PreviousResults.Any())
+{
+    <div class="card mb-4">
+        <div class="card-header bg-secondary text-white">Previous Results (Year @Model.PreviousResults.First().Year)</div>
+        <div class="card-body">
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th>Percentage</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var result in Model.PreviousResults)
+                    {
+                        <tr>
+                            <td>@result.Subject.Name</td>
+                            <td>@result.Percentage%</td>
+                            <td>
+                                @if (result.Percentage < 30)
+                                {
+                                    <span class="text-danger">Failed</span>
+                                }
+                                else
+                                {
+                                    <span class="text-success">Passed</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            @{
+                var avg = Model.PreviousResults.Average(r => r.Percentage);
+                var failed = Model.PreviousResults.Count(r => r.Percentage < 30);
+                var grade = Model.PreviousResults.FirstOrDefault()?.Grade ?? 0;
+            }
+
+            <div class="alert alert-info">
+                <strong>Average:</strong> @avg.ToString("F2")% |
+                <strong>Failed Subjects:</strong> @failed |
+                <strong>Previous Grade:</strong> Grade @grade
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Enrollment Form -->
+@using (Html.BeginForm("Enroll", "Admin", FormMethod.Post))
+{
+    <!-- Year -->
+    <div class="form-group mb-3">
+        @Html.LabelFor(m => m.Year)
+        @Html.DropDownListFor(m => m.Year, Model.YearList, "Select Year", new { @class = "form-control", @id = "yearDropdown" })
+    </div>
+
+    <!-- Student Type -->
+    <div class="form-group mb-3">
+        @Html.LabelFor(m => m.StudentType)
+        @Html.DropDownListFor(m => m.StudentType, Model.StudentTypeList, "Select Type", new { @class = "form-control", @id = "typeDropdown" })
+    </div>
+
+    <!-- Grade -->
+    <div class="form-group mb-3">
+        @Html.LabelFor(m => m.SelectedGrade, "Grade")
+        @Html.DropDownListFor(m => m.SelectedGrade, Model.GradeList, "Select Grade", new { @class = "form-control", @id = "gradeDropdown" })
+    </div>
+
+    <!-- Stream (only visible for Grade >= 10) -->
+    <div id="streamContainer" class="form-group mb-3" style="display:@(Model.SelectedGrade >= 10 ? "block" : "none")">
+        @Html.LabelFor(m => m.SelectedStreamId, "Stream")
+        @Html.DropDownListFor(m => m.SelectedStreamId, Model.StreamList, "Select Stream", new { @class = "form-control", @id = "streamDropdown" })
+    </div>
+
+    <!-- Subjects display -->
+    <div id="subjectsContainer" class="form-group mb-3">
+        <label>Subjects</label>
+
+        @if (Model.Subjects != null && Model.Subjects.Any())
+        {
+            var isLocked = Model.SelectedGrade == 8 || Model.SelectedGrade == 9;
+
+            if (isLocked)
+            {
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Subject Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < Model.Subjects.Count; i++)
+                        {
+                            <tr>
+                                <td>@(i + 1)</td>
+                                <td>@Model.Subjects[i].Name</td>
+                                @Html.HiddenFor(m => m.Subjects[i].Id)
+                                @Html.HiddenFor(m => m.Subjects[i].Name)
+                                @Html.HiddenFor(m => m.Subjects[i].Selected)
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+                <div class="alert alert-info mt-2">
+                    All subjects are mandatory for Grade @Model.SelectedGrade and have been pre-selected.
+                </div>
+            }
+            else
+            {
+                for (int i = 0; i < Model.Subjects.Count; i++)
+                {
+                    <div class="form-check mb-2">
+                        @Html.CheckBoxFor(m => m.Subjects[i].Selected, new { @class = "form-check-input", aria_label = Model.Subjects[i].Name })
+                        @Html.HiddenFor(m => m.Subjects[i].Id)
+                        @Html.HiddenFor(m => m.Subjects[i].Name)
+                        <label class="form-check-label">@Model.Subjects[i].Name</label>
+                    </div>
+                }
+            }
+        }
+        else
+        {
+            <div class="alert alert-warning">No subjects available for the selected grade.</div>
+        }
+    </div>
+
+    <button type="submit" class="btn btn-primary" @(Model.CanSubmit ? "" : "disabled")>Submit Enrollment</button>
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            var yearDropdown = $("#yearDropdown");
+            var typeDropdown = $("#typeDropdown");
+            var gradeDropdown = $("#gradeDropdown");
+            var streamDropdown = $("#streamDropdown");
+            var streamContainer = $("#streamContainer");
+            var subjectsContainer = $("#subjectsContainer");
+            var submitBtn = $("button[type='submit']");
+
+            function toggleSubmit() {
+                var checkedCount = subjectsContainer.find("input[type='checkbox']:checked").length;
+                var grade = parseInt(gradeDropdown.val());
+
+                if (grade >= 10) {
+                    submitBtn.prop("disabled", checkedCount < 7);
+                } else {
+                    submitBtn.prop("disabled", false); // Grade 8–9: all subjects preselected
+                }
+            }
+
+            function fetchSubjects(grade, streamId) {
+                if (!grade || grade < 10) return;
+
+                $.getJSON('@Url.Action("GetSubjects","Admin")', { gradeLevel: grade, streamId: streamId }, function (data) {
+                    subjectsContainer.empty();
+
+                    if (data.length === 0) {
+                        subjectsContainer.append('<div class="alert alert-warning">No subjects available for the selected grade.</div>');
+                        toggleSubmit();
+                        return;
+                    }
+
+                    $.each(data, function (index, subject) {
+                        var div = $('<div class="form-check mb-2"></div>');
+                        var checkbox = $('<input type="checkbox" class="form-check-input"/>')
+                            .attr('name', 'Subjects[' + index + '].Selected')
+                            .val(true)
+                            .on('change', toggleSubmit);
+                        var hiddenId = $('<input type="hidden"/>').attr('name', 'Subjects[' + index + '].Id').val(subject.Id);
+                        var hiddenName = $('<input type="hidden"/>').attr('name', 'Subjects[' + index + '].Name').val(subject.Name);
+                        var label = $('<label class="form-check-label"></label>').text(subject.Name);
+
+                        div.append(checkbox).append(hiddenId).append(hiddenName).append(label);
+                        subjectsContainer.append(div);
+                    });
+
+                    toggleSubmit();
+                });
+            }
+
+            function loadStreamsAndSubjects() {
+                var grade = parseInt(gradeDropdown.val());
+                if (!grade) return;
+
+                if (grade >= 10) {
+                    streamContainer.show();
+                    streamDropdown.prop("disabled", true);
+
+                    $.getJSON('@Url.Action("GetStreams","Admin")', { gradeLevel: grade }, function (data) {
+                        streamDropdown.empty().append($('<option>', { value: '', text: 'Select Stream' }));
+                        $.each(data, function (_, stream) {
+                            streamDropdown.append($('<option>', { value: stream.Id, text: stream.Name }));
+                        });
+                        streamDropdown.prop("disabled", false);
+
+                        var selectedStream = parseInt(streamDropdown.val());
+                        if (selectedStream) {
+                            fetchSubjects(grade, selectedStream);
+                        }
+                    });
+                } else {
+                    streamContainer.hide();
+                    streamDropdown.empty();
+                    toggleSubmit(); // Grade 8–9: subjects already rendered
+                }
+            }
+
+            function isReadyToLoad() {
+                return yearDropdown.val() && typeDropdown.val() && gradeDropdown.val();
+            }
+
+            yearDropdown.on("change", function () {
+                if (isReadyToLoad()) loadStreamsAndSubjects();
+            });
+
+            typeDropdown.on("change", function () {
+                if (isReadyToLoad()) loadStreamsAndSubjects();
+            });
+
+            gradeDropdown.on("change", function () {
+                if (isReadyToLoad()) loadStreamsAndSubjects();
+            });
+
+            streamDropdown.on("change", function () {
+                var grade = parseInt(gradeDropdown.val());
+                var streamId = parseInt($(this).val());
+                fetchSubjects(grade, streamId);
+            });
+
+            if (isReadyToLoad()) {
+                var initialGrade = parseInt(gradeDropdown.val());
+                var initialStream = initialGrade >= 10 ? parseInt(streamDropdown.val()) : null;
+                if (initialGrade >= 10) {
+                    fetchSubjects(initialGrade, initialStream);
+                } else {
+                    toggleSubmit();
+                }
+            }
+        });
+    </script>
+}
+

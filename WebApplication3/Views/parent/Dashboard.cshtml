@@ -1,0 +1,78 @@
+﻿@model WebApplication3.Models.Parent
+@{
+    ViewBag.Title = "Parent Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<!-- Mobile Toggle Button -->
+<button class="btn btn-outline-dark d-md-none m-2" onclick="toggleSidebar()">
+    ☰ Menu
+</button>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav id="sidebar" class="col-md-3 col-12 bg-dark text-white vh-100 sticky-top d-none d-md-block" style="overflow-y:auto;">
+            <div class="px-3 py-4">
+                <h4 class="text-center border-bottom pb-3 mb-4">Parent Panel</h4>
+
+                <!-- Dashboard Shortcut -->
+                <div class="text-center mb-4">
+                    @Html.ActionLink("🏠 Dashboard", "Dashboard", "Parent", null, new { @class = "btn btn-primary w-75" })
+                </div>
+
+                <!-- Section: Student Info -->
+                <button class="btn btn-dark w-100 text-start mb-2" onclick="toggleMenu('studentMenu')">
+                    🎓 Linked Student
+                </button>
+                <div id="studentMenu" class="submenu ps-3" style="display:none;">
+                    @Html.ActionLink("Student Report Card", "ReportCard", "Parent", null, new { @class = "d-block py-2 text-white text-decoration-none" })
+                    @Html.ActionLink("My Child Attendance", "ChildAttendance", "Parent", null, new { @class = "d-block py-2 text-white text-decoration-none" })
+                </div>
+
+                <!-- Section: Uniforms -->
+                <button class="btn btn-dark w-100 text-start mb-2" onclick="toggleMenu('uniformMenu')">
+                    👕 Uniform Shop
+                </button>
+                <div id="uniformMenu" class="submenu ps-3" style="display:none;">
+                    @Html.ActionLink("Buy School Uniform", "Index", "Uniform", null, new { @class = "d-block py-2 text-white text-decoration-none" })
+                    @Html.ActionLink("My Orders", "MyOrders", "Parent", null, new { @class = "d-block py-2 text-white text-decoration-none" })
+                </div>
+
+                <!-- My Profile -->
+                <a href="@Url.Action("EditProfile", "Parent")" class="btn btn-dark w-100 text-start mb-2">
+                    <i class="fas fa-user-edit me-2"></i> Update Profile
+                </a>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="col-md-9 col-12 pt-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light text-dark">
+                    <h4 class="mb-0">Welcome, @Model.FullName</h4>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h5>Parent Details</h5>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item"><strong>Email:</strong> @Model.Email</li>
+                            <li class="list-group-item"><strong>Linked Student ID:</strong> @Model.LinkedStudentID</li>
+                            <li class="list-group-item"><strong>Phone Number:</strong> @Model.PhoneNumber</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+    function toggleMenu(menuId) {
+        const menu = document.getElementById(menuId);
+        menu.style.display = menu.style.display === "block" ? "none" : "block";
+    }
+    function toggleSidebar() {
+        const sidebar = document.getElementById("sidebar");
+        sidebar.classList.toggle("d-none");
+    }
+
+</script>

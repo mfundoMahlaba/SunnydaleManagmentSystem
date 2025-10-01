@@ -1,0 +1,31 @@
+﻿@model List<WebApplication3.Models.Student>
+
+<h2>Student Management</h2>
+
+<table class="table table-bordered table-striped">
+    <thead class="thead-dark">
+        <tr>
+            <th>Full Name</th>
+            <th>ID Number</th>
+            <th>Email</th>
+            <th>Grade</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var student in Model)
+        {
+            <tr>
+                <td>@student.FullName</td>
+                <td>@student.IDNumber</td>
+                <td>@student.Email</td>
+                <td>@student.Grade?.Description ?? "Unassigned"</td>
+                <td>
+                    @Html.ActionLink("Edit", "EditStudent", "Admin", new { id = student.Id }, new { @class = "btn btn-sm btn-primary me-1" })
+                    @Html.ActionLink("Delete", "DeleteStudent", "Admin", new { id = student.Id }, new { @class = "btn btn-sm btn-danger me-1" })
+                    @Html.ActionLink("Reset Password", "ResetPassword", "Admin", new { id = student.Id }, new { @class = "btn btn-sm btn-warning" })
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

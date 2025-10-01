@@ -1,0 +1,50 @@
+﻿@model WebApplication3.ViewModels.SendAnnouncementViewModel
+
+<div class="container py-4">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0 fw-semibold">📢 Send Announcement</h4>
+        </div>
+
+        <div class="card-body bg-light">
+            @using (Html.BeginForm())
+            {
+                @Html.AntiForgeryToken()
+
+                <div class="mb-3">
+                    @Html.LabelFor(m => m.SubjectId, htmlAttributes: new { @class = "form-label fw-semibold text-dark" })
+                    @Html.DropDownListFor(m => m.SubjectId, Model.SubjectOptions, "-- Select Subject --", new { @class = "form-select" })
+                    @Html.ValidationMessageFor(m => m.SubjectId, "", new { @class = "text-danger small" })
+                </div>
+
+                <div class="mb-3">
+                    @Html.LabelFor(m => m.GradeId, htmlAttributes: new { @class = "form-label fw-semibold text-dark" })
+                    @Html.DropDownListFor(m => m.GradeId, Model.GradeOptions, "-- Select Grade --", new { @class = "form-select" })
+                    @Html.ValidationMessageFor(m => m.GradeId, "", new { @class = "text-danger small" })
+                </div>
+
+                <div class="mb-3">
+                    @Html.LabelFor(m => m.Title, htmlAttributes: new { @class = "form-label fw-semibold text-dark" })
+                    @Html.TextBoxFor(m => m.Title, new { @class = "form-control", placeholder = "Enter announcement title..." })
+                    @Html.ValidationMessageFor(m => m.Title, "", new { @class = "text-danger small" })
+                </div>
+
+                <div class="mb-3">
+                    @Html.LabelFor(m => m.Message, htmlAttributes: new { @class = "form-label fw-semibold text-dark" })
+                    @Html.TextAreaFor(m => m.Message, new { @class = "form-control", rows = 5, placeholder = "Write your message here..." })
+                    @Html.ValidationMessageFor(m => m.Message, "", new { @class = "text-danger small" })
+                </div>
+
+                <div class="text-end">
+                    <button type="submit" class="btn btn-primary px-4">
+                        <i class="fas fa-paper-plane me-1"></i> Send Announcement
+                    </button>
+                </div>
+            }
+        </div>
+
+        <div class="card-footer text-muted text-center small">
+            Announcements will be emailed to all students enrolled in the selected subject and grade.
+        </div>
+    </div>
+</div>

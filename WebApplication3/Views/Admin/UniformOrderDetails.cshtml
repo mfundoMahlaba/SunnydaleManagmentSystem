@@ -1,0 +1,59 @@
+﻿@model WebApplication3.Models.UniformOrder
+@{
+    ViewBag.Title = "Order Details";
+}
+
+<h2>Order Details</h2>
+
+<ul class="list-unstyled">
+    <li><strong>Order #:</strong> @Model.Id</li>
+    <li><strong>Date:</strong> @Model.OrderDate.ToString("dd MMM yyyy HH:mm")</li>
+    <li><strong>Status:</strong> <span class="text-success fw-bold">Paid</span></li>
+    <li><strong>Total:</strong> @Model.TotalAmount.ToString("C")</li>
+    <li><strong>Recipient:</strong> @Model.RecipientName (@Model.RecipientEmail)</li>
+</ul>
+
+@if (Model.Items != null && Model.Items.Any())
+{
+    <h4>Items</h4>
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Size</th>
+                <th>Unit Price</th>
+                <th>Quantity</th>
+                <th>Line Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var it in Model.Items)
+            {
+                <tr>
+                    <td>@(it.UniformItem != null ? it.UniformItem.Name : "Item #" + it.UniformItemId)</td>
+                    <td>@it.Size</td>
+                    <td>@it.UnitPrice.ToString("C")</td>
+                    <td>@it.Quantity</td>
+                    <td>@((it.UnitPrice * it.Quantity).ToString("C"))</td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="4" class="text-end"><strong>Grand Total:</strong></td>
+                <td><strong>@Model.TotalAmount.ToString("C")</strong></td>
+            </tr>
+        </tfoot>
+    </table>
+}
+
+<div class="mt-4">
+    <a href="@Url.Action("UniformOrders", "Admin")" class="btn btn-secondary">Back to Orders</a>
+</div>
+
+<hr />
+
+<p class="text-muted">
+    This order has been automatically completed after payment.
+    Stock levels were updated at checkout, and low-stock alerts were emailed to admins if applicable.
+</p>

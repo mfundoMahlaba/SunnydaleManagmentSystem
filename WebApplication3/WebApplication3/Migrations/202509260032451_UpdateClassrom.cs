@@ -1,0 +1,22 @@
+﻿namespace WebApplication3.Migrations
+{
+    using System;
+    using System.Data.Entity.Migrations;
+    
+    public partial class UpdateClassrom : DbMigration
+    {
+        public override void Up()
+        {
+            DropForeignKey("dbo.Classrooms", "Stream_Id", "dbo.Streams");
+            DropIndex("dbo.Classrooms", new[] { "Stream_Id" });
+            DropColumn("dbo.Classrooms", "Stream_Id");
+        }
+        
+        public override void Down()
+        {
+            AddColumn("dbo.Classrooms", "Stream_Id", c => c.Int());
+            CreateIndex("dbo.Classrooms", "Stream_Id");
+            AddForeignKey("dbo.Classrooms", "Stream_Id", "dbo.Streams", "Id");
+        }
+    }
+}

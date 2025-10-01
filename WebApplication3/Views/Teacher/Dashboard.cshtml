@@ -1,0 +1,86 @@
+﻿@model WebApplication3.ViewModels.TeacherDashboardViewModel
+@{
+    ViewBag.Title = "Teacher Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<!-- Mobile Toggle Button -->
+<button class="btn btn-outline-dark d-md-none m-2" onclick="toggleSidebar()">
+    ☰ Menu
+</button>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav id="sidebar" class="col-md-3 col-12 bg-dark text-white vh-100 sticky-top d-none d-md-block" style="overflow-y:auto;">
+            <div class="px-3 py-4">
+                <h4 class="text-center border-bottom pb-3 mb-4">Teacher Panel</h4>
+
+                <!-- Dashboard Shortcut -->
+                <div class="text-center mb-4">
+                    @Html.ActionLink("📊 Dashboard", "Dashboard", "Teacher", null, new { @class = "btn btn-primary w-75" })
+                </div>
+
+                <!-- Section: Subjects -->
+                @Html.ActionLink("📚 My Assigned Subjects", "MySubjects", "Teacher", null, new { @class = "btn btn-dark w-100 text-start mb-2" })
+
+                @Html.ActionLink("👩‍🏫 My Students", "SubjectMarks", "Teacher", null, new { @class = "btn btn-dark w-100 text-start mb-2" })
+
+                @Html.ActionLink("📊 Summary of Marks", "MarkSummary", "Teacher", null, new { @class = "btn btn-dark w-100 text-start mb-2" })
+
+                @Html.ActionLink("📝 Upload Learning Material", "UploadMaterial", "Teacher", null, new { @class = "btn btn-dark w-100 text-start mb-2" })
+
+                @Html.ActionLink("📂 My Uploaded Materials", "MyMaterials", "Teacher", null, new { @class = "btn btn-dark w-100 text-start mb-2" })
+
+                @Html.ActionLink("📅 Teaching Timetable", "ViewMyTimetable", "Teacher", null, new { @class = "btn btn-dark w-100 text-start mb-2" })
+
+                <a href="@Url.Action("SendAnnouncement", "Teacher")" class="btn btn-dark w-100 text-start mb-2">
+                    <i class="fas fa-bullhorn me-2"></i> Send Announcements
+                </a>
+
+                <!-- Section: Academic -->
+                <button class="btn btn-dark w-100 text-start mb-2" onclick="toggleMenu('academicMenu')">
+                    📘 Academic Management
+                </button>
+                <div id="academicMenu" class="submenu ps-3" style="display:none;">
+                    @Html.ActionLink("Attendance Register", "MarkAttendance", "Teacher", null, new { @class = "d-block py-2 text-white text-decoration-none" })
+                    @Html.ActionLink("Attendance History", "AttendanceHistory", "Teacher", null, new { @class = "d-block py-2 text-white text-decoration-none" })
+                </div>
+
+                <!-- Section: Profile -->
+                @Html.ActionLink("📝 Update Profile", "EditProfile", "Teacher", null, new { @class = "btn btn-dark w-100 text-start mb-2" })
+  
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="col-md-9 col-12 pt-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light text-dark">
+                    <h4 class="mb-0">Welcome, @Model.FullName</h4>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h5>Teacher Details</h5>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item"><strong>Teacher ID:</strong> @Model.Id</li>
+                            <li class="list-group-item"><strong>Full Name:</strong> @Model.FullName</li>
+                            <li class="list-group-item"><strong>Email:</strong> @Model.Email</li>
+                            <li class="list-group-item"><strong>Phone Number:</strong> @Model.PhoneNumber</li>
+                            <li class="list-group-item"><strong>Home Address:</strong> @Model.HomeAddress</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+    function toggleMenu(menuId) {
+        const menu = document.getElementById(menuId);
+        menu.style.display = menu.style.display === "block" ? "none" : "block";
+    }
+    function toggleSidebar() {
+        const sidebar = document.getElementById("sidebar");
+        sidebar.classList.toggle("d-none");
+    }
+</script>
