@@ -93,22 +93,32 @@
 </head>
 <body>
 
-    @if (Session["UserRole"] == null)
-    {
-        <!-- Navbar Start -->
-        <div class="container-fluid sticky-top bg-white shadow-sm">
-            <div class="container">
-                <nav class="navbar navbar-expand-lg navbar-light">
+    <!-- Navbar Start -->
+    <!-- Navbar Start -->
+    <div class="container-fluid sticky-top bg-white shadow-sm">
+        <div class="container">
+            <nav class="navbar navbar-expand-lg navbar-light">
+                @if (Session["UserRole"] == null)
+                {
                     <a href="@Url.Action("Index", "Home")" class="navbar-brand">
                         <h4 class="mb-0">Sunnydale Management System</h4>
                     </a>
+                }
+                else
+                {
+                    <a href="@Url.Action("Dashboard", Session["UserRole"].ToString())" class="navbar-brand">
+                        <i class="bi bi-house-door-fill"></i>
+                    </a>
+                }
 
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
 
-                    <div class="collapse navbar-collapse" id="navbarCollapse">
-                        <div class="navbar-nav ms-auto">
+                <div class="collapse navbar-collapse" id="navbarCollapse">
+                    <div class="navbar-nav ms-auto">
+                        @if (Session["UserRole"] == null)
+                        {
                             <a href="@Url.Action("Index", "Home")" class="nav-item nav-link">Home</a>
                             <a href="@Url.Action("About", "Home")" class="nav-item nav-link">About</a>
                             <a href="@Url.Action("Contact", "Home")" class="nav-item nav-link">Contact</a>
@@ -121,15 +131,34 @@
                                     <a href="@Url.Action("Login", "Admin")" class="dropdown-item">Admin Login</a>
                                 </div>
                             </div>
-                        </div>
+                        }
+                        else
+                        {
+                            if (Session["UserRole"].ToString() == "Admin")
+                            {
+                            }
+                            else if (Session["UserRole"].ToString() == "Teacher")
+                            {
+
+                            }
+                            else if (Session["UserRole"].ToString() == "Student")
+                            {
+
+                            }
+                            else if (Session["UserRole"].ToString() == "Parent")
+                            {
+
+                            }
+
+                            <span class="nav-item nav-link">@Session["fullName"]</span>
+                            <a href="@Url.Action("Logout", Session["UserRole"].ToString())" class="nav-item nav-link text-danger">Logout</a>
+                        }
                     </div>
-                </nav>
-            </div>
+                </div>
+            </nav>
         </div>
-        <!-- Navbar End -->
-    }
-
-
+    </div>
+    <!-- Navbar End -->
     <!-- Main Content -->
     <div class="container mt-4">
         @RenderBody()
